@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="adminTitle">لوحة التحكم - AL SAHRA PRECIOUS METALS</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/svg+xml" href="logo.svg">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <img src="logo.svg" alt="AL SAHRA Logo" class="logo-img">
+                <div class="logo-text">
+                    <h1>AL SAHRA PRECIOUS METALS & LOGISTICS</h1>
+                    <p class="tagline" data-i18n="taglineAdmin">لوحة التحكم</p>
+                </div>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html" data-i18n="navHome">الرئيسية</a></li>
+                    <li><a href="tracking.html" data-i18n="navTracking">تتبع الشحنة</a></li>
+                    <li><a href="admin.html" class="active" data-i18n="navAdmin">لوحة التحكم</a></li>
+                </ul>
+                <div class="language-switcher">
+                    <button class="lang-btn" onclick="setLanguage('ar')" id="lang-ar">العربية</button>
+                    <button class="lang-btn" onclick="setLanguage('en')" id="lang-en">English</button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Login Section -->
+        <section id="loginSection" class="login-section">
+            <div class="container">
+                <div class="login-box">
+                    <h2 data-i18n="loginTitle">تسجيل الدخول</h2>
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label for="username" data-i18n="labelUsername">اسم المستخدم:</label>
+                            <input type="text" id="username" required autocomplete="username">
+                        </div>
+                        <div class="form-group">
+                            <label for="password" data-i18n="labelPassword">كلمة المرور:</label>
+                            <input type="password" id="password" required autocomplete="current-password">
+                        </div>
+                        <div id="loginError" class="error-message" style="display: none;"></div>
+                        <button type="submit" class="btn-primary" data-i18n="loginButton">تسجيل الدخول</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Admin Section (Hidden until authenticated) -->
+        <section id="adminSection" class="admin-section" style="display: none;">
+            <div class="container">
+                <div class="admin-header">
+                    <h2 data-i18n="adminTitle">لوحة التحكم - إدارة الشحنات</h2>
+                    <button id="logoutBtn" class="btn-logout" data-i18n="logoutButton">تسجيل الخروج</button>
+                </div>
+
+                <div class="admin-tabs">
+                    <button class="tab-btn active" data-tab="create" data-i18n="tabCreate">إنشاء شحنة جديدة</button>
+                    <button class="tab-btn" data-tab="manage" data-i18n="tabManage">إدارة الشحنات</button>
+                </div>
+
+                <!-- Create Shipment Tab -->
+                <div id="createTab" class="tab-content active">
+                    <form class="admin-form" id="createShipmentForm">
+                        <h3 data-i18n="createTitle">إنشاء شحنة جديدة</h3>
+                        <div class="form-group">
+                            <label for="newTrackingNumber" data-i18n="labelTrackingNumber">رقم التتبع:</label>
+                            <input type="text" id="newTrackingNumber" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="recipientName" data-i18n="labelRecipientName">اسم المستلم:</label>
+                            <input type="text" id="recipientName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="recipientAddress" data-i18n="labelRecipientAddress">عنوان المستلم:</label>
+                            <textarea id="recipientAddress" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="senderName" data-i18n="labelSenderName">اسم المرسل:</label>
+                            <input type="text" id="senderName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="senderAddress" data-i18n="labelSenderAddress">عنوان المرسل:</label>
+                            <textarea id="senderAddress" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="shipmentWeight" data-i18n="labelWeight">الوزن (كجم):</label>
+                            <input type="number" id="shipmentWeight" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="shipmentDescription" data-i18n="labelDescription">وصف الشحنة:</label>
+                            <textarea id="shipmentDescription"></textarea>
+                        </div>
+                        <button type="submit" class="btn-primary" data-i18n="createButton">إنشاء الشحنة</button>
+                    </form>
+                </div>
+
+                <!-- Manage Shipments Tab -->
+                <div id="manageTab" class="tab-content">
+                    <div class="search-box">
+                        <input type="text" id="searchTracking" data-i18n="searchPlaceholder" placeholder="ابحث برقم التتبع...">
+                        <button id="searchBtn" data-i18n="searchButton">بحث</button>
+                    </div>
+
+                    <div id="shipmentList" class="shipment-list">
+                        <!-- Shipments will be listed here -->
+                    </div>
+
+                    <div id="editShipmentModal" class="modal" style="display: none;">
+                        <div class="modal-content">
+                            <span class="close-modal">&times;</span>
+                            <h3 data-i18n="editStatusTitle">تعديل حالة الشحنة</h3>
+                            <form id="updateStatusForm">
+                                <div class="form-group">
+                                    <label data-i18n="addNewStatus">إضافة حالة جديدة:</label>
+                                    <select id="newStatus">
+                                        <option value="pending" data-i18n="statusPending">قيد الانتظار</option>
+                                        <option value="picked_up" data-i18n="statusPickedUp">تم الاستلام</option>
+                                        <option value="in_transit" data-i18n="statusInTransit">قيد النقل</option>
+                                        <option value="out_for_delivery" data-i18n="statusOutForDelivery">قيد التوصيل</option>
+                                        <option value="delivered" data-i18n="statusDelivered">تم التسليم</option>
+                                        <option value="exception" data-i18n="statusException">استثناء</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label data-i18n="labelLocation">الموقع:</label>
+                                    <input type="text" id="statusLocation" required>
+                                </div>
+                                <div class="form-group">
+                                    <label data-i18n="labelDateTime">التاريخ والوقت:</label>
+                                    <input type="datetime-local" id="statusDateTime" required>
+                                </div>
+                                <div class="form-group">
+                                    <label data-i18n="labelNotes">ملاحظات:</label>
+                                    <textarea id="statusNotes"></textarea>
+                                </div>
+                                <button type="submit" class="btn-primary" data-i18n="addStatusButton">إضافة الحالة</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3 data-i18n="companyInfo">معلومات الشركة</h3>
+                    <p><strong>AL SAHRA PRECIOUS METALS & LOGISTICS LLC</strong></p>
+                    <p data-i18n="addressArabic">طريق الملك فهد، حي العليا</p>
+                    <p>King Fahd Road, Al Olaya District</p>
+                    <p><span data-i18n="crNumber">الرقم الموحد:</span> 1010894457</p>
+                </div>
+                <div class="footer-section">
+                    <h3 data-i18n="contactUs">اتصل بنا</h3>
+                    <p><span data-i18n="phone">الهاتف:</span> <a href="tel:+966114872290">+966 11 487 2290</a></p>
+                    <p><span data-i18n="email">البريد الإلكتروني:</span> <a href="mailto:export@alsahrapml.com">export@alsahrapml.com</a></p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 AL SAHRA PRECIOUS METALS & LOGISTICS LLC. <span data-i18n="copyright">جميع الحقوق محفوظة.</span></p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/translations.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>
+

@@ -7,11 +7,12 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             const trackingNumber = document.getElementById('trackingNumber').value.trim();
             if (trackingNumber) {
-                window.location.href = `tracking.html?track=${encodeURIComponent(trackingNumber)}`;
+                window.location.href = `/tracking?track=${encodeURIComponent(trackingNumber)}`;
             }
         });
     }
 });
+
 
 
 

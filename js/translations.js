@@ -536,10 +536,18 @@ function translatePage() {
     // Update page title based on current page
     const path = window.location.pathname;
     let titleKey = 'pageTitle';
-    if (path.includes('tracking.html')) {
+    if (path.includes('/tracking')) {
         titleKey = 'trackingTitle';
-    } else if (path.includes('admin.html')) {
+    } else if (path.includes('/admin')) {
         titleKey = 'adminTitle';
+    } else if (path.includes('/contact')) {
+        titleKey = 'contactTitle';
+    } else if (path.includes('/zip-lookup')) {
+        titleKey = 'zipLookupTitle';
+    } else if (path.includes('/calculate-price')) {
+        titleKey = 'calculatePriceTitle';
+    } else if (path.includes('/schedule-pickup')) {
+        titleKey = 'schedulePickupTitle';
     }
     
     if (translations[currentLang] && translations[currentLang][titleKey]) {

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="calculatePriceTitle">حساب السعر - AL SAHRA PRECIOUS METALS</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/svg+xml" href="logo.svg">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <img src="logo.svg" alt="AL SAHRA Logo" class="logo-img">
+                <div class="logo-text">
+                    <h1>AL SAHRA PRECIOUS METALS & LOGISTICS</h1>
+                    <p class="tagline" data-i18n="tagline">خدمات الشحن والتوصيل الموثوقة</p>
+                </div>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html" data-i18n="navHome">الرئيسية</a></li>
+                    <li><a href="tracking.html" data-i18n="navTracking">تتبع الشحنة</a></li>
+                    <li><a href="zip-lookup.html" data-i18n="navZipLookup">البحث عن الرمز البريدي</a></li>
+                    <li><a href="calculate-price.html" class="active" data-i18n="navCalculatePrice">حساب السعر</a></li>
+                    <li><a href="schedule-pickup.html" data-i18n="navSchedulePickup">جدولة الاستلام</a></li>
+                    <li><a href="contact.html" data-i18n="navContact">اتصل بنا</a></li>
+                    <li><a href="admin.html" data-i18n="navAdmin">لوحة التحكم</a></li>
+                </ul>
+                <div class="language-switcher">
+                    <button class="lang-btn" onclick="setLanguage('ar')" id="lang-ar">العربية</button>
+                    <button class="lang-btn" onclick="setLanguage('en')" id="lang-en">English</button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="page-hero">
+            <div class="container">
+                <h2 data-i18n="calculatePricePageTitle">حساب سعر الشحن</h2>
+                <p data-i18n="calculatePriceSubtitle">احسب تكلفة شحنتك بناءً على الوزن والأبعاد وطريقة الشحن</p>
+            </div>
+        </section>
+
+        <section class="calculate-price-section">
+            <div class="container">
+                <div class="price-calculator-container">
+                    <div class="calculator-grid">
+                        <!-- Input Form -->
+                        <div class="calculator-form">
+                            <h3 data-i18n="shipmentDetails">تفاصيل الشحنة</h3>
+                            <form id="priceCalculatorForm">
+                                <div class="form-group">
+                                    <label for="originCity" data-i18n="labelOrigin">المدينة الأصلية:</label>
+                                    <select id="originCity" required>
+                                        <option value="" data-i18n="selectCity">اختر المدينة</option>
+                                        <option value="Riyadh" data-i18n="cityRiyadh">الرياض</option>
+                                        <option value="Jeddah" data-i18n="cityJeddah">جدة</option>
+                                        <option value="Dammam" data-i18n="cityDammam">الدمام</option>
+                                        <option value="Mecca" data-i18n="cityMecca">مكة المكرمة</option>
+                                        <option value="Medina" data-i18n="cityMedina">المدينة المنورة</option>
+                                        <option value="Khobar" data-i18n="cityKhobar">الخبر</option>
+                                        <option value="Taif" data-i18n="cityTaif">الطائف</option>
+                                        <option value="Abha" data-i18n="cityAbha">أبها</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="destinationCity" data-i18n="labelDestination">المدينة الوجهة:</label>
+                                    <select id="destinationCity" required>
+                                        <option value="" data-i18n="selectCity">اختر المدينة</option>
+                                        <option value="Riyadh" data-i18n="cityRiyadh">الرياض</option>
+                                        <option value="Jeddah" data-i18n="cityJeddah">جدة</option>
+                                        <option value="Dammam" data-i18n="cityDammam">الدمام</option>
+                                        <option value="Mecca" data-i18n="cityMecca">مكة المكرمة</option>
+                                        <option value="Medina" data-i18n="cityMedina">المدينة المنورة</option>
+                                        <option value="Khobar" data-i18n="cityKhobar">الخبر</option>
+                                        <option value="Taif" data-i18n="cityTaif">الطائف</option>
+                                        <option value="Abha" data-i18n="cityAbha">أبها</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="shipmentWeight" data-i18n="labelWeight">الوزن (كجم):</label>
+                                    <input type="number" id="shipmentWeight" step="0.1" min="0.1" required>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="shipmentLength" data-i18n="labelLength">الطول (سم):</label>
+                                        <input type="number" id="shipmentLength" step="0.1" min="1" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="shipmentWidth" data-i18n="labelWidth">العرض (سم):</label>
+                                        <input type="number" id="shipmentWidth" step="0.1" min="1" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="shipmentHeight" data-i18n="labelHeight">الارتفاع (سم):</label>
+                                        <input type="number" id="shipmentHeight" step="0.1" min="1" required>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="serviceType" data-i18n="labelServiceType">نوع الخدمة:</label>
+                                    <select id="serviceType" required>
+                                        <option value="standard" data-i18n="serviceStandard">عادي (3-5 أيام)</option>
+                                        <option value="express" data-i18n="serviceExpress">سريع (1-2 أيام)</option>
+                                        <option value="overnight" data-i18n="serviceOvernight">ليلي (24 ساعة)</option>
+                                        <option value="secure" data-i18n="serviceSecure">مؤمن (مع تأمين)</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>
+                                        <input type="checkbox" id="insuranceRequired">
+                                        <span data-i18n="insuranceRequired">تأمين إضافي (1% من قيمة الشحنة)</span>
+                                    </label>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="declaredValue" data-i18n="labelDeclaredValue">القيمة المعلنة (ريال سعودي):</label>
+                                    <input type="number" id="declaredValue" step="0.01" min="0" value="0">
+                                </div>
+
+                                <button type="submit" class="btn-primary" data-i18n="calculateButton">احسب السعر</button>
+                            </form>
+                        </div>
+
+                        <!-- Results -->
+                        <div class="calculator-results">
+                            <h3 data-i18n="priceEstimate">التقدير</h3>
+                            <div id="priceResults" class="price-results" style="display: none;">
+                                <div class="price-breakdown">
+                                    <div class="price-item">
+                                        <span data-i18n="basePrice">السعر الأساسي:</span>
+                                        <span id="basePrice">0.00</span> <span data-i18n="currency">ريال</span>
+                                    </div>
+                                    <div class="price-item">
+                                        <span data-i18n="weightCharge">رسوم الوزن:</span>
+                                        <span id="weightCharge">0.00</span> <span data-i18n="currency">ريال</span>
+                                    </div>
+                                    <div class="price-item">
+                                        <span data-i18n="distanceCharge">رسوم المسافة:</span>
+                                        <span id="distanceCharge">0.00</span> <span data-i18n="currency">ريال</span>
+                                    </div>
+                                    <div class="price-item">
+                                        <span data-i18n="serviceCharge">رسوم الخدمة:</span>
+                                        <span id="serviceCharge">0.00</span> <span data-i18n="currency">ريال</span>
+                                    </div>
+                                    <div class="price-item" id="insuranceRow" style="display: none;">
+                                        <span data-i18n="insuranceCharge">رسوم التأمين:</span>
+                                        <span id="insuranceCharge">0.00</span> <span data-i18n="currency">ريال</span>
+                                    </div>
+                                    <div class="price-total">
+                                        <span data-i18n="totalPrice">المجموع:</span>
+                                        <span id="totalPrice">0.00</span> <span data-i18n="currency">ريال</span>
+                                    </div>
+                                </div>
+                                <div class="price-note">
+                                    <p data-i18n="priceNote">* هذا تقدير تقريبي. قد يختلف السعر النهائي حسب التفاصيل الفعلية للشحنة.</p>
+                                </div>
+                            </div>
+                            <div id="priceError" class="error-message" style="display: none;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3 data-i18n="companyInfo">معلومات الشركة</h3>
+                    <p><strong>AL SAHRA PRECIOUS METALS & LOGISTICS LLC</strong></p>
+                    <p data-i18n="addressArabic">طريق الملك فهد، حي العليا</p>
+                    <p>King Fahd Road, Al Olaya District</p>
+                    <p><span data-i18n="crNumber">الرقم الموحد:</span> 1010894457</p>
+                </div>
+                <div class="footer-section">
+                    <h3 data-i18n="contactUs">اتصل بنا</h3>
+                    <p><span data-i18n="phone">الهاتف:</span> <a href="tel:+966114872290">+966 11 487 2290</a></p>
+                    <p><span data-i18n="email">البريد الإلكتروني:</span> <a href="mailto:export@alsahrapml.com">export@alsahrapml.com</a></p>
+                </div>
+                <div class="footer-section">
+                    <h3 data-i18n="quickLinks">روابط سريعة</h3>
+                    <ul>
+                        <li><a href="index.html" data-i18n="navHome">الرئيسية</a></li>
+                        <li><a href="tracking.html" data-i18n="navTracking">تتبع الشحنة</a></li>
+                        <li><a href="zip-lookup.html" data-i18n="navZipLookup">البحث عن الرمز البريدي</a></li>
+                        <li><a href="calculate-price.html" data-i18n="navCalculatePrice">حساب السعر</a></li>
+                        <li><a href="schedule-pickup.html" data-i18n="navSchedulePickup">جدولة الاستلام</a></li>
+                        <li><a href="contact.html" data-i18n="navContact">اتصل بنا</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 AL SAHRA PRECIOUS METALS & LOGISTICS LLC. <span data-i18n="copyright">جميع الحقوق محفوظة.</span></p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/firebase-config.js"></script>
+    <script src="js/database.js"></script>
+    <script src="js/translations.js"></script>
+    <script src="js/calculate-price.js"></script>
+</body>
+</html>
+

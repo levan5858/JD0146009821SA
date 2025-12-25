@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="schedulePickupTitle">جدولة الاستلام - AL SAHRA PRECIOUS METALS</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/svg+xml" href="logo.svg">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <img src="logo.svg" alt="AL SAHRA Logo" class="logo-img">
+                <div class="logo-text">
+                    <h1>AL SAHRA PRECIOUS METALS & LOGISTICS</h1>
+                    <p class="tagline" data-i18n="tagline">خدمات الشحن والتوصيل الموثوقة</p>
+                </div>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html" data-i18n="navHome">الرئيسية</a></li>
+                    <li><a href="tracking.html" data-i18n="navTracking">تتبع الشحنة</a></li>
+                    <li><a href="zip-lookup.html" data-i18n="navZipLookup">البحث عن الرمز البريدي</a></li>
+                    <li><a href="calculate-price.html" data-i18n="navCalculatePrice">حساب السعر</a></li>
+                    <li><a href="schedule-pickup.html" class="active" data-i18n="navSchedulePickup">جدولة الاستلام</a></li>
+                    <li><a href="contact.html" data-i18n="navContact">اتصل بنا</a></li>
+                    <li><a href="admin.html" data-i18n="navAdmin">لوحة التحكم</a></li>
+                </ul>
+                <div class="language-switcher">
+                    <button class="lang-btn" onclick="setLanguage('ar')" id="lang-ar">العربية</button>
+                    <button class="lang-btn" onclick="setLanguage('en')" id="lang-en">English</button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="page-hero">
+            <div class="container">
+                <h2 data-i18n="schedulePickupPageTitle">جدولة استلام الشحنة</h2>
+                <p data-i18n="schedulePickupSubtitle">حدد موعداً لاستلام شحنتك من موقعك</p>
+            </div>
+        </section>
+
+        <section class="schedule-pickup-section">
+            <div class="container">
+                <div class="pickup-form-container">
+                    <form id="pickupForm" class="pickup-form">
+                        <h3 data-i18n="pickupDetails">تفاصيل الاستلام</h3>
+
+                        <div class="form-group">
+                            <label for="pickupName" data-i18n="labelName">الاسم الكامل:</label>
+                            <input type="text" id="pickupName" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="pickupPhone" data-i18n="labelPhone">رقم الهاتف:</label>
+                            <input type="tel" id="pickupPhone" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="pickupEmail" data-i18n="labelEmail">البريد الإلكتروني:</label>
+                            <input type="email" id="pickupEmail" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="pickupAddress" data-i18n="labelAddress">عنوان الاستلام:</label>
+                            <textarea id="pickupAddress" rows="3" required></textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="pickupCity" data-i18n="labelCity">المدينة:</label>
+                                <select id="pickupCity" required>
+                                    <option value="" data-i18n="selectCity">اختر المدينة</option>
+                                    <option value="Riyadh" data-i18n="cityRiyadh">الرياض</option>
+                                    <option value="Jeddah" data-i18n="cityJeddah">جدة</option>
+                                    <option value="Dammam" data-i18n="cityDammam">الدمام</option>
+                                    <option value="Mecca" data-i18n="cityMecca">مكة المكرمة</option>
+                                    <option value="Medina" data-i18n="cityMedina">المدينة المنورة</option>
+                                    <option value="Khobar" data-i18n="cityKhobar">الخبر</option>
+                                    <option value="Taif" data-i18n="cityTaif">الطائف</option>
+                                    <option value="Abha" data-i18n="cityAbha">أبها</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="pickupZipCode" data-i18n="labelZipCode">الرمز البريدي:</label>
+                                <input type="text" id="pickupZipCode" pattern="[0-9]{5}" placeholder="12345">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="pickupDate" data-i18n="labelPickupDate">تاريخ الاستلام:</label>
+                            <input type="date" id="pickupDate" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="pickupTime" data-i18n="labelPickupTime">وقت الاستلام:</label>
+                            <select id="pickupTime" required>
+                                <option value="" data-i18n="selectTime">اختر الوقت</option>
+                                <option value="08:00-10:00" data-i18n="timeMorning1">8:00 ص - 10:00 ص</option>
+                                <option value="10:00-12:00" data-i18n="timeMorning2">10:00 ص - 12:00 م</option>
+                                <option value="12:00-14:00" data-i18n="timeAfternoon1">12:00 م - 2:00 م</option>
+                                <option value="14:00-16:00" data-i18n="timeAfternoon2">2:00 م - 4:00 م</option>
+                                <option value="16:00-18:00" data-i18n="timeEvening">4:00 م - 6:00 م</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="pickupPackageCount" data-i18n="labelPackageCount">عدد الطرود:</label>
+                            <input type="number" id="pickupPackageCount" min="1" max="10" value="1" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="pickupWeight" data-i18n="labelWeight">الوزن التقريبي (كجم):</label>
+                            <input type="number" id="pickupWeight" step="0.1" min="0.1" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="pickupInstructions" data-i18n="labelInstructions">تعليمات خاصة (اختياري):</label>
+                            <textarea id="pickupInstructions" rows="3" placeholder="أي تعليمات خاصة لسائق الاستلام..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="pickupAgreement" required>
+                                <span data-i18n="pickupAgreement">أوافق على الشروط والأحكام</span>
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn-primary" data-i18n="schedulePickupButton">جدولة الاستلام</button>
+                    </form>
+
+                    <div id="pickupFormMessage" class="form-message" style="display: none;"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3 data-i18n="companyInfo">معلومات الشركة</h3>
+                    <p><strong>AL SAHRA PRECIOUS METALS & LOGISTICS LLC</strong></p>
+                    <p data-i18n="addressArabic">طريق الملك فهد، حي العليا</p>
+                    <p>King Fahd Road, Al Olaya District</p>
+                    <p><span data-i18n="crNumber">الرقم الموحد:</span> 1010894457</p>
+                </div>
+                <div class="footer-section">
+                    <h3 data-i18n="contactUs">اتصل بنا</h3>
+                    <p><span data-i18n="phone">الهاتف:</span> <a href="tel:+966114872290">+966 11 487 2290</a></p>
+                    <p><span data-i18n="email">البريد الإلكتروني:</span> <a href="mailto:export@alsahrapml.com">export@alsahrapml.com</a></p>
+                </div>
+                <div class="footer-section">
+                    <h3 data-i18n="quickLinks">روابط سريعة</h3>
+                    <ul>
+                        <li><a href="index.html" data-i18n="navHome">الرئيسية</a></li>
+                        <li><a href="tracking.html" data-i18n="navTracking">تتبع الشحنة</a></li>
+                        <li><a href="zip-lookup.html" data-i18n="navZipLookup">البحث عن الرمز البريدي</a></li>
+                        <li><a href="calculate-price.html" data-i18n="navCalculatePrice">حساب السعر</a></li>
+                        <li><a href="schedule-pickup.html" data-i18n="navSchedulePickup">جدولة الاستلام</a></li>
+                        <li><a href="contact.html" data-i18n="navContact">اتصل بنا</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 AL SAHRA PRECIOUS METALS & LOGISTICS LLC. <span data-i18n="copyright">جميع الحقوق محفوظة.</span></p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/firebase-config.js"></script>
+    <script src="js/database.js"></script>
+    <script src="js/translations.js"></script>
+    <script src="js/schedule-pickup.js"></script>
+</body>
+</html>
+

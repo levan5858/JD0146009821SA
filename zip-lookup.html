@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n="pageTitle">AL SAHRA PRECIOUS METALS & LOGISTICS LLC - Track Your Shipment</title>
+    <title data-i18n="zipLookupTitle">البحث عن الرمز البريدي - AL SAHRA PRECIOUS METALS</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="icon" type="image/svg+xml" href="logo.svg">
     <!-- Firebase SDK -->
@@ -22,9 +22,9 @@
             </div>
             <nav>
                 <ul>
-                    <li><a href="index.html" class="active" data-i18n="navHome">الرئيسية</a></li>
+                    <li><a href="index.html" data-i18n="navHome">الرئيسية</a></li>
                     <li><a href="tracking.html" data-i18n="navTracking">تتبع الشحنة</a></li>
-                    <li><a href="zip-lookup.html" data-i18n="navZipLookup">البحث عن الرمز البريدي</a></li>
+                    <li><a href="zip-lookup.html" class="active" data-i18n="navZipLookup">البحث عن الرمز البريدي</a></li>
                     <li><a href="calculate-price.html" data-i18n="navCalculatePrice">حساب السعر</a></li>
                     <li><a href="schedule-pickup.html" data-i18n="navSchedulePickup">جدولة الاستلام</a></li>
                     <li><a href="contact.html" data-i18n="navContact">اتصل بنا</a></li>
@@ -39,49 +39,48 @@
     </header>
 
     <main>
-        <section class="hero">
+        <section class="page-hero">
             <div class="container">
-                <h2 data-i18n="heroTitle">تتبع شحنتك بسهولة</h2>
-                <p data-i18n="heroSubtitle">أدخل رقم التتبع الخاص بك للحصول على آخر تحديثات شحنتك</p>
-                <form class="track-form" id="trackForm" action="tracking.html" method="get">
-                    <input type="text" id="trackingNumber" name="track" data-i18n="trackPlaceholder" placeholder="أدخل رقم التتبع" required>
-                    <button type="submit" data-i18n="trackButton">تتبع</button>
-                </form>
+                <h2 data-i18n="zipLookupPageTitle">البحث عن الرمز البريدي</h2>
+                <p data-i18n="zipLookupSubtitle">ابحث عن الرمز البريدي لأي منطقة في المملكة العربية السعودية</p>
             </div>
         </section>
 
-        <section class="services">
+        <section class="zip-lookup-section">
             <div class="container">
-                <h2 data-i18n="servicesTitle">خدماتنا</h2>
-                <div class="services-grid">
-                    <div class="service-card">
-                        <div class="icon">📦</div>
-                        <h3 data-i18n="serviceFast">شحن سريع</h3>
-                        <p data-i18n="serviceFastDesc">خدمة شحن سريعة وآمنة داخل المملكة العربية السعودية</p>
+                <div class="zip-lookup-container">
+                    <div class="zip-search-box">
+                        <form id="zipLookupForm" class="zip-form">
+                            <div class="form-group">
+                                <label for="zipSearchInput" data-i18n="zipSearchLabel">ابحث بالمدينة أو المنطقة أو الرمز البريدي:</label>
+                                <input type="text" id="zipSearchInput" placeholder="مثال: الرياض، جدة، 11564" data-i18n="zipSearchPlaceholder" autocomplete="off">
+                            </div>
+                            <button type="submit" class="btn-primary" data-i18n="searchButton">بحث</button>
+                        </form>
                     </div>
-                    <div class="service-card">
-                        <div class="icon">🌍</div>
-                        <h3 data-i18n="serviceInternational">شحن دولي</h3>
-                        <p data-i18n="serviceInternationalDesc">نقل البضائع الثمينة والمعادن إلى جميع أنحاء العالم</p>
+
+                    <div id="zipResults" class="zip-results" style="display: none;">
+                        <h3 data-i18n="zipResultsTitle">نتائج البحث</h3>
+                        <div id="zipResultsList" class="zip-results-list"></div>
                     </div>
-                    <div class="service-card">
-                        <div class="icon">🔒</div>
-                        <h3 data-i18n="serviceSecure">أمان مضمون</h3>
-                        <p data-i18n="serviceSecureDesc">حماية كاملة لشحناتك مع تأمين شامل</p>
-                    </div>
-                    <div class="service-card">
-                        <div class="icon">📱</div>
-                        <h3 data-i18n="serviceRealTime">تتبع مباشر</h3>
-                        <p data-i18n="serviceRealTimeDesc">تتبع شحنتك في الوقت الفعلي من أي مكان</p>
+
+                    <div id="zipError" class="error-message" style="display: none;"></div>
+
+                    <!-- Popular Cities -->
+                    <div class="popular-cities">
+                        <h3 data-i18n="popularCitiesTitle">المدن الشائعة</h3>
+                        <div class="cities-grid">
+                            <button class="city-btn" onclick="searchZip('Riyadh')" data-i18n="cityRiyadh">الرياض</button>
+                            <button class="city-btn" onclick="searchZip('Jeddah')" data-i18n="cityJeddah">جدة</button>
+                            <button class="city-btn" onclick="searchZip('Dammam')" data-i18n="cityDammam">الدمام</button>
+                            <button class="city-btn" onclick="searchZip('Mecca')" data-i18n="cityMecca">مكة المكرمة</button>
+                            <button class="city-btn" onclick="searchZip('Medina')" data-i18n="cityMedina">المدينة المنورة</button>
+                            <button class="city-btn" onclick="searchZip('Khobar')" data-i18n="cityKhobar">الخبر</button>
+                            <button class="city-btn" onclick="searchZip('Taif')" data-i18n="cityTaif">الطائف</button>
+                            <button class="city-btn" onclick="searchZip('Abha')" data-i18n="cityAbha">أبها</button>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </section>
-
-        <section class="about">
-            <div class="container">
-                <h2 data-i18n="aboutTitle">من نحن</h2>
-                <p data-i18n="aboutText">AL SAHRA PRECIOUS METALS & LOGISTICS LLC هي شركة رائدة في مجال الشحن والخدمات اللوجستية في المملكة العربية السعودية. نحن متخصصون في نقل المعادن الثمينة والبضائع عالية القيمة بأعلى معايير الأمان والجودة.</p>
             </div>
         </section>
     </main>
@@ -122,7 +121,7 @@
     <script src="js/firebase-config.js"></script>
     <script src="js/database.js"></script>
     <script src="js/translations.js"></script>
-    <script src="js/main.js"></script>
+    <script src="js/zip-lookup.js"></script>
 </body>
 </html>
 

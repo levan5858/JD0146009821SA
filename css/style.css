@@ -1142,3 +1142,444 @@ footer {
     }
 }
 
+/* Page Hero Section (for new pages) */
+.page-hero {
+    background: linear-gradient(135deg, var(--light-green) 0%, var(--lighter-green) 100%);
+    color: var(--white);
+    padding: 3rem 0;
+    text-align: center;
+}
+
+.page-hero h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.page-hero p {
+    font-size: 1.2rem;
+}
+
+/* Contact Page */
+.contact-section {
+    padding: 3rem 0;
+}
+
+.contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    margin-top: 2rem;
+}
+
+.contact-form-container,
+.contact-info-container {
+    background: var(--white);
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.contact-form h3,
+.contact-info-container h3 {
+    color: var(--primary-green);
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+}
+
+.contact-form .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.contact-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-dark);
+    font-weight: 500;
+}
+
+.contact-form input,
+.contact-form select,
+.contact-form textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid var(--border-color);
+    border-radius: 5px;
+    font-size: 1rem;
+    font-family: inherit;
+}
+
+.contact-form input:focus,
+.contact-form select:focus,
+.contact-form textarea:focus {
+    outline: none;
+    border-color: var(--light-green);
+}
+
+.contact-info-item {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.contact-info-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.contact-icon {
+    font-size: 2rem;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--lighter-green);
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.contact-info-item h4 {
+    color: var(--primary-green);
+    margin-bottom: 0.5rem;
+}
+
+.contact-info-item p {
+    color: var(--text-light);
+    line-height: 1.6;
+}
+
+.contact-info-item a {
+    color: var(--secondary-green);
+    text-decoration: none;
+}
+
+.contact-info-item a:hover {
+    text-decoration: underline;
+}
+
+.contact-map {
+    margin-top: 2rem;
+}
+
+.contact-map iframe {
+    width: 100%;
+    height: 300px;
+    border-radius: 10px;
+}
+
+.form-message {
+    padding: 1rem;
+    border-radius: 5px;
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.form-message.success {
+    background-color: var(--lighter-green);
+    color: var(--primary-green);
+}
+
+.form-message.error {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+/* ZIP Lookup Page */
+.zip-lookup-section {
+    padding: 3rem 0;
+}
+
+.zip-lookup-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.zip-search-box {
+    background: var(--white);
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+}
+
+.zip-form {
+    display: flex;
+    gap: 1rem;
+}
+
+.zip-form .form-group {
+    flex: 1;
+}
+
+.zip-results {
+    background: var(--white);
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+}
+
+.zip-results h3 {
+    color: var(--primary-green);
+    margin-bottom: 1.5rem;
+}
+
+.zip-results-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.zip-result-item {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1rem;
+    background: var(--light-bg);
+    border-radius: 8px;
+    border-left: 4px solid var(--light-green);
+}
+
+.zip-code {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--primary-green);
+    min-width: 100px;
+}
+
+.zip-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.zip-details strong {
+    color: var(--text-dark);
+    font-size: 1.1rem;
+}
+
+.zip-details span {
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+
+.popular-cities {
+    background: var(--white);
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.popular-cities h3 {
+    color: var(--primary-green);
+    margin-bottom: 1.5rem;
+}
+
+.cities-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+}
+
+.city-btn {
+    padding: 1rem;
+    background: var(--light-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    color: var(--text-dark);
+    transition: all 0.3s;
+}
+
+.city-btn:hover {
+    background: var(--lighter-green);
+    border-color: var(--light-green);
+    color: var(--primary-green);
+    transform: translateY(-2px);
+}
+
+/* Calculate Price Page */
+.calculate-price-section {
+    padding: 3rem 0;
+}
+
+.price-calculator-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.calculator-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    margin-top: 2rem;
+}
+
+.calculator-form,
+.calculator-results {
+    background: var(--white);
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.calculator-form h3,
+.calculator-results h3 {
+    color: var(--primary-green);
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.price-results {
+    margin-top: 1rem;
+}
+
+.price-breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.price-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem;
+    background: var(--light-bg);
+    border-radius: 5px;
+}
+
+.price-item span:first-child {
+    color: var(--text-dark);
+}
+
+.price-item span:last-child {
+    color: var(--primary-green);
+    font-weight: bold;
+}
+
+.price-total {
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem;
+    background: var(--lighter-green);
+    border-radius: 5px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--primary-green);
+    margin-top: 1rem;
+}
+
+.price-note {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: var(--light-bg);
+    border-radius: 5px;
+    font-size: 0.9rem;
+    color: var(--text-light);
+    font-style: italic;
+}
+
+/* Schedule Pickup Page */
+.schedule-pickup-section {
+    padding: 3rem 0;
+}
+
+.pickup-form-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.pickup-form {
+    background: var(--white);
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.pickup-form h3 {
+    color: var(--primary-green);
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+}
+
+.pickup-form .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.pickup-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-dark);
+    font-weight: 500;
+}
+
+.pickup-form input,
+.pickup-form select,
+.pickup-form textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid var(--border-color);
+    border-radius: 5px;
+    font-size: 1rem;
+    font-family: inherit;
+}
+
+.pickup-form input:focus,
+.pickup-form select:focus,
+.pickup-form textarea:focus {
+    outline: none;
+    border-color: var(--light-green);
+}
+
+.pickup-form input[type="checkbox"] {
+    width: auto;
+    margin-left: 0.5rem;
+}
+
+.pickup-form .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+/* Responsive Design for New Pages */
+@media (max-width: 768px) {
+    .page-hero h2 {
+        font-size: 1.8rem;
+    }
+
+    .contact-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .calculator-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .zip-form {
+        flex-direction: column;
+    }
+
+    .cities-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .pickup-form .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+

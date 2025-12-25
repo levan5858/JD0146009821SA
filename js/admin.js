@@ -348,13 +348,20 @@ function displayShipment(shipment) {
         <p><strong>${translations[lang].sender}:</strong> ${shipment.senderName}</p>
         <p><strong>${translations[lang].recipient}:</strong> ${shipment.recipientName}</p>
         <p><strong>${translations[lang].weight}:</strong> ${shipment.weight} ${weightUnit}</p>
-        ${shipment.description ? `<p><strong>${translations[lang].description}:</strong> ${shipment.description}</p>` : ''}
-        ${shipment.tags && shipment.tags.length > 0 ? `
-        <div class="shipment-tags">
-            <strong>${translations[lang].tags || 'Tags'}:</strong>
+        ${shipment.description ? `
+        <div class="description-with-tags">
+            <p><strong>${translations[lang].description}:</strong> ${shipment.description}</p>
+            ${shipment.tags && shipment.tags.length > 0 ? `
+            <div class="tags-overlay">
+                ${renderTags(shipment.tags)}
+            </div>
+            ` : ''}
+        </div>
+        ` : (shipment.tags && shipment.tags.length > 0 ? `
+        <div class="tags-overlay-standalone">
             ${renderTags(shipment.tags)}
         </div>
-        ` : ''}
+        ` : '')}
         <p><strong>${translations[lang].updateCount}</strong> ${shipment.statusHistory.length}</p>
     `;
     

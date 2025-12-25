@@ -168,19 +168,24 @@ function displayTrackingInfo(shipment) {
                 ${shipment.weight} ${weightUnit}
             </div>
             ${shipment.description ? `
-            <div class="detail-item">
-                <strong>${translations[lang].description}:</strong>
-                ${shipment.description}
-            </div>
-            ` : ''}
-            ${shipment.tags && shipment.tags.length > 0 ? `
             <div class="detail-item detail-item-full">
-                <strong>${translations[lang].tags || 'Tags'}:</strong>
-                <div class="tags-display">
+                <div class="description-with-tags">
+                    <strong>${translations[lang].description}:</strong>
+                    ${shipment.description}
+                    ${shipment.tags && shipment.tags.length > 0 ? `
+                    <div class="tags-overlay">
+                        ${shipment.tags.map(tag => `<span class="tag-badge-display">${tag}</span>`).join('')}
+                    </div>
+                    ` : ''}
+                </div>
+            </div>
+            ` : (shipment.tags && shipment.tags.length > 0 ? `
+            <div class="detail-item detail-item-full">
+                <div class="tags-overlay-standalone">
                     ${shipment.tags.map(tag => `<span class="tag-badge-display">${tag}</span>`).join('')}
                 </div>
             </div>
-            ` : ''}
+            ` : '')}
         </div>
     `;
 }

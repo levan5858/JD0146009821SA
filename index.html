@@ -21,7 +21,12 @@
                 </div>
             </div>
             <nav>
-                <ul>
+                <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <ul class="nav-menu" id="navMenu">
                     <li><a href="index.html" class="active" data-i18n="navHome">الرئيسية</a></li>
                     <li><a href="tracking.html" data-i18n="navTracking">تتبع الشحنة</a></li>
                     <li><a href="zip-lookup.html" data-i18n="navZipLookup">البحث عن الرمز البريدي</a></li>
@@ -78,6 +83,28 @@
             </div>
         </section>
 
+        <section class="about-services">
+            <div class="container">
+                <div class="about-services-content">
+                    <h2 data-i18n="aboutServicesTitle">About Our Services</h2>
+                    <div class="service-highlight">
+                        <div class="highlight-item">
+                            <div class="highlight-number">20+</div>
+                            <div class="highlight-text" data-i18n="yearsService">Years of Excellence</div>
+                            <p data-i18n="yearsServiceDesc">We've been in service for over 20 years, delivering trusted logistics solutions worldwide.</p>
+                        </div>
+                        <div class="highlight-item">
+                            <div class="globe-container">
+                                <div class="globe-animation">🌍</div>
+                            </div>
+                            <div class="highlight-text" data-i18n="globalShipping">Global Shipping</div>
+                            <p data-i18n="globalShippingDesc">We ship to every continent, connecting businesses and individuals across the globe.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <section class="about">
             <div class="container">
                 <h2 data-i18n="aboutTitle">من نحن</h2>
@@ -122,6 +149,7 @@
     <script src="js/firebase-config.js"></script>
     <script src="js/database.js"></script>
     <script src="js/translations.js"></script>
+    <script src="js/mobile-menu.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>

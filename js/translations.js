@@ -42,6 +42,12 @@ const translations = {
         serviceRealTimeDesc: "تتبع شحنتك في الوقت الفعلي من أي مكان",
         
         // About
+        aboutServicesTitle: "عن خدماتنا",
+        yearsService: "سنوات من التميز",
+        yearsServiceDesc: "نحن في الخدمة لأكثر من 20 عاماً، نقدم حلول لوجستية موثوقة على مستوى العالم.",
+        globalShipping: "الشحن العالمي",
+        globalShippingDesc: "نشحن إلى جميع القارات، وربط الشركات والأفراد في جميع أنحاء العالم.",
+        labelCurrency: "العملة:",
         aboutTitle: "من نحن",
         aboutText: "AL SAHRA PRECIOUS METALS & LOGISTICS LLC هي شركة رائدة في مجال الشحن والخدمات اللوجستية في المملكة العربية السعودية. نحن متخصصون في نقل المعادن الثمينة والبضائع عالية القيمة بأعلى معايير الأمان والجودة.",
         
@@ -271,6 +277,12 @@ const translations = {
         serviceRealTimeDesc: "Track your shipment in real-time from anywhere",
         
         // About
+        aboutServicesTitle: "About Our Services",
+        yearsService: "Years of Excellence",
+        yearsServiceDesc: "We've been in service for over 20 years, delivering trusted logistics solutions worldwide.",
+        globalShipping: "Global Shipping",
+        globalShippingDesc: "We ship to every continent, connecting businesses and individuals across the globe.",
+        labelCurrency: "Currency:",
         aboutTitle: "About Us",
         aboutText: "AL SAHRA PRECIOUS METALS & LOGISTICS LLC is a leading company in shipping and logistics services in Saudi Arabia. We specialize in transporting precious metals and high-value goods with the highest standards of safety and quality.",
         

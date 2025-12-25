@@ -352,13 +352,13 @@ function displayShipment(shipment) {
         <div class="description-with-tags">
             <p><strong>${translations[lang].description}:</strong> ${shipment.description}</p>
             ${shipment.tags && shipment.tags.length > 0 ? `
-            <div class="tags-overlay">
+            <div class="tags-container-inline">
                 ${renderTags(shipment.tags)}
             </div>
             ` : ''}
         </div>
         ` : (shipment.tags && shipment.tags.length > 0 ? `
-        <div class="tags-overlay-standalone">
+        <div class="tags-container-standalone">
             ${renderTags(shipment.tags)}
         </div>
         ` : '')}

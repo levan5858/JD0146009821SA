@@ -58,15 +58,10 @@
                 <div class="zip-lookup-container">
                     <div class="zip-search-box">
                         <form id="zipLookupForm" class="zip-form">
-                            <div class="form-group">
-                                <label for="zipCountry" data-i18n="zipCountryLabel">Country:</label>
-                                <select id="zipCountry">
-                                    <option value="" data-i18n="selectCountry">Select Country</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="zipSearchInput" data-i18n="zipSearchLabel">Search by City, Area, or Postal Code:</label>
-                                <input type="text" id="zipSearchInput" placeholder="Example: Riyadh, Jeddah, 11564" data-i18n="zipSearchPlaceholder" autocomplete="off">
+                            <div class="form-group zip-search-full">
+                                <label for="zipSearchInput" data-i18n="zipSearchLabel">Search by Country, City, Area, or Postal Code:</label>
+                                <input type="text" id="zipSearchInput" placeholder="Example: Riyadh, Saudi Arabia, 11564, or New York, USA" data-i18n="zipSearchPlaceholder" autocomplete="off">
+                                <small class="search-hint" data-i18n="zipSearchHint">You can search by any country, city name, or postal code from anywhere in the world</small>
                             </div>
                             <button type="submit" class="btn-primary" data-i18n="searchButton">Search</button>
                         </form>
@@ -79,12 +74,8 @@
 
                     <div id="zipError" class="error-message" style="display: none;"></div>
 
-                    <!-- Popular Countries -->
-                    <div class="popular-cities">
-                        <h3 data-i18n="popularCountriesTitle">Popular Countries</h3>
-                        <div class="cities-grid" id="popularCountriesGrid">
-                            <!-- Will be populated dynamically -->
-                        </div>
+                    <div class="search-info">
+                        <p data-i18n="zipSearchInfo">Search for postal codes from any country worldwide. Enter a city name, country name, or postal code to find accurate results.</p>
                     </div>
                 </div>
             </div>

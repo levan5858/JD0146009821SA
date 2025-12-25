@@ -171,9 +171,9 @@ function displayTrackingInfo(shipment) {
             <div class="detail-item detail-item-full">
                 <div class="description-with-tags">
                     <strong>${translations[lang].description}:</strong>
-                    ${shipment.description}
+                    <p>${shipment.description}</p>
                     ${shipment.tags && shipment.tags.length > 0 ? `
-                    <div class="tags-overlay">
+                    <div class="tags-container-inline">
                         ${shipment.tags.map(tag => `<span class="tag-badge-display">${tag}</span>`).join('')}
                     </div>
                     ` : ''}
@@ -181,7 +181,7 @@ function displayTrackingInfo(shipment) {
             </div>
             ` : (shipment.tags && shipment.tags.length > 0 ? `
             <div class="detail-item detail-item-full">
-                <div class="tags-overlay-standalone">
+                <div class="tags-container-standalone">
                     ${shipment.tags.map(tag => `<span class="tag-badge-display">${tag}</span>`).join('')}
                 </div>
             </div>

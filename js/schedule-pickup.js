@@ -1,5 +1,58 @@
 // Schedule pickup functionality
 document.addEventListener('DOMContentLoaded', function() {
+    // Populate country dropdown
+    const pickupCountrySelect = document.getElementById('pickupCountry');
+    const pickupCitySelect = document.getElementById('pickupCity');
+    
+    if (pickupCountrySelect) {
+        const countries = getAllCountries();
+        countries.forEach(country => {
+            const option = document.createElement('option');
+            option.value = country;
+            option.textContent = country;
+            pickupCountrySelect.appendChild(option);
+        });
+        
+        // Set default to Saudi Arabia
+        pickupCountrySelect.value = 'Saudi Arabia';
+        updatePickupCities('Saudi Arabia');
+        
+        // Add event listener for country changes
+        pickupCountrySelect.addEventListener('change', function() {
+            updatePickupCities(this.value);
+        });
+    }
+    
+    function updatePickupCities(country) {
+        if (!pickupCitySelect) return;
+        
+        pickupCitySelect.innerHTML = '';
+        
+        if (!country) {
+            const option = document.createElement('option');
+            option.value = '';
+            option.textContent = 'Select Country First';
+            pickupCitySelect.appendChild(option);
+            pickupCitySelect.disabled = true;
+            return;
+        }
+        
+        pickupCitySelect.disabled = false;
+        const cities = getCitiesForCountry(country);
+        
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'Select City';
+        pickupCitySelect.appendChild(defaultOption);
+        
+        cities.forEach(city => {
+            const option = document.createElement('option');
+            option.value = city;
+            option.textContent = city;
+            pickupCitySelect.appendChild(option);
+        });
+    }
+    
     const pickupForm = document.getElementById('pickupForm');
     
     // Set minimum date to tomorrow
@@ -29,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const agreement = document.getElementById('pickupAgreement').checked;
             
             // Validation
-            if (!name || !phone || !email || !address || !city || !date || !time || !packageCount || !weight) {
+            if (!name || !phone || !email || !address || !country || !city || !date || !time || !packageCount || !weight) {
                 showPickupMessage(translations[lang].alertFillRequired || 'Please fill in all required fields', 'error');
                 return;
             }
@@ -56,6 +109,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     phone: phone,
                     email: email,
                     address: address,
+                    country: country,
                     city: city,
                     zipCode: zipCode,
                     date: date,

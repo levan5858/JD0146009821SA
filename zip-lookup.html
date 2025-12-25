@@ -59,10 +59,16 @@
                     <div class="zip-search-box">
                         <form id="zipLookupForm" class="zip-form">
                             <div class="form-group">
-                                <label for="zipSearchInput" data-i18n="zipSearchLabel">ابحث بالمدينة أو المنطقة أو الرمز البريدي:</label>
-                                <input type="text" id="zipSearchInput" placeholder="مثال: الرياض، جدة، 11564" data-i18n="zipSearchPlaceholder" autocomplete="off">
+                                <label for="zipCountry" data-i18n="zipCountryLabel">Country:</label>
+                                <select id="zipCountry">
+                                    <option value="" data-i18n="selectCountry">Select Country</option>
+                                </select>
                             </div>
-                            <button type="submit" class="btn-primary" data-i18n="searchButton">بحث</button>
+                            <div class="form-group">
+                                <label for="zipSearchInput" data-i18n="zipSearchLabel">Search by City, Area, or Postal Code:</label>
+                                <input type="text" id="zipSearchInput" placeholder="Example: Riyadh, Jeddah, 11564" data-i18n="zipSearchPlaceholder" autocomplete="off">
+                            </div>
+                            <button type="submit" class="btn-primary" data-i18n="searchButton">Search</button>
                         </form>
                     </div>
 
@@ -73,18 +79,11 @@
 
                     <div id="zipError" class="error-message" style="display: none;"></div>
 
-                    <!-- Popular Cities -->
+                    <!-- Popular Countries -->
                     <div class="popular-cities">
-                        <h3 data-i18n="popularCitiesTitle">المدن الشائعة</h3>
-                        <div class="cities-grid">
-                            <button class="city-btn" onclick="searchZip('Riyadh')">Riyadh</button>
-                            <button class="city-btn" onclick="searchZip('Dubai')">Dubai</button>
-                            <button class="city-btn" onclick="searchZip('London')">London</button>
-                            <button class="city-btn" onclick="searchZip('New York')">New York</button>
-                            <button class="city-btn" onclick="searchZip('Paris')">Paris</button>
-                            <button class="city-btn" onclick="searchZip('Tokyo')">Tokyo</button>
-                            <button class="city-btn" onclick="searchZip('Sydney')">Sydney</button>
-                            <button class="city-btn" onclick="searchZip('Toronto')">Toronto</button>
+                        <h3 data-i18n="popularCountriesTitle">Popular Countries</h3>
+                        <div class="cities-grid" id="popularCountriesGrid">
+                            <!-- Will be populated dynamically -->
                         </div>
                     </div>
                 </div>
@@ -128,6 +127,7 @@
     <script src="js/firebase-config.js"></script>
     <script src="js/database.js"></script>
     <script src="js/translations.js"></script>
+    <script src="js/countries-data.js"></script>
     <script src="js/mobile-menu.js"></script>
     <script src="js/zip-lookup.js"></script>
 </body>

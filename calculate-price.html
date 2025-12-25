@@ -62,36 +62,30 @@
                             <h3 data-i18n="shipmentDetails">تفاصيل الشحنة</h3>
                             <form id="priceCalculatorForm">
                                 <div class="form-group">
+                                    <label for="originCountry" data-i18n="labelOriginCountry">Origin Country:</label>
+                                    <select id="originCountry" required>
+                                        <option value="" data-i18n="selectCountry">Select Country</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
                                     <label for="originCity" data-i18n="labelOrigin">Origin City:</label>
-                                    <select id="originCity" required>
-                                        <option value="" data-i18n="selectCity">Select City</option>
-                                        <option value="Riyadh">Riyadh, Saudi Arabia</option>
-                                        <option value="Dubai">Dubai, UAE</option>
-                                        <option value="London">London, UK</option>
-                                        <option value="New York">New York, USA</option>
-                                        <option value="Paris">Paris, France</option>
-                                        <option value="Tokyo">Tokyo, Japan</option>
-                                        <option value="Sydney">Sydney, Australia</option>
-                                        <option value="Toronto">Toronto, Canada</option>
-                                        <option value="Berlin">Berlin, Germany</option>
-                                        <option value="Beijing">Beijing, China</option>
+                                    <select id="originCity" required disabled>
+                                        <option value="" data-i18n="selectCity">Select Country First</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="destinationCountry" data-i18n="labelDestinationCountry">Destination Country:</label>
+                                    <select id="destinationCountry" required>
+                                        <option value="" data-i18n="selectCountry">Select Country</option>
                                     </select>
                                 </div>
 
                                 <div class="form-group">
                                     <label for="destinationCity" data-i18n="labelDestination">Destination City:</label>
-                                    <select id="destinationCity" required>
-                                        <option value="" data-i18n="selectCity">Select City</option>
-                                        <option value="Riyadh">Riyadh, Saudi Arabia</option>
-                                        <option value="Dubai">Dubai, UAE</option>
-                                        <option value="London">London, UK</option>
-                                        <option value="New York">New York, USA</option>
-                                        <option value="Paris">Paris, France</option>
-                                        <option value="Tokyo">Tokyo, Japan</option>
-                                        <option value="Sydney">Sydney, Australia</option>
-                                        <option value="Toronto">Toronto, Canada</option>
-                                        <option value="Berlin">Berlin, Germany</option>
-                                        <option value="Beijing">Beijing, China</option>
+                                    <select id="destinationCity" required disabled>
+                                        <option value="" data-i18n="selectCity">Select Country First</option>
                                     </select>
                                 </div>
 
@@ -99,13 +93,6 @@
                                     <label for="currencySelect" data-i18n="labelCurrency">Currency:</label>
                                     <select id="currencySelect">
                                         <option value="SAR">SAR (Saudi Riyal)</option>
-                                        <option value="USD">USD (US Dollar)</option>
-                                        <option value="EUR">EUR (Euro)</option>
-                                        <option value="GBP">GBP (British Pound)</option>
-                                        <option value="AED">AED (UAE Dirham)</option>
-                                        <option value="JPY">JPY (Japanese Yen)</option>
-                                        <option value="AUD">AUD (Australian Dollar)</option>
-                                        <option value="CAD">CAD (Canadian Dollar)</option>
                                     </select>
                                 </div>
 
@@ -233,6 +220,7 @@
     <script src="js/firebase-config.js"></script>
     <script src="js/database.js"></script>
     <script src="js/translations.js"></script>
+    <script src="js/countries-data.js"></script>
     <script src="js/mobile-menu.js"></script>
     <script src="js/calculate-price.js"></script>
 </body>

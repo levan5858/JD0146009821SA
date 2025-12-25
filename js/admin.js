@@ -1,4 +1,6 @@
 // Admin functionality
+let adminInitialized = false;
+
 document.addEventListener('DOMContentLoaded', function() {
     // Wait a bit to ensure auth.js is loaded
     setTimeout(function() {
@@ -9,9 +11,39 @@ document.addEventListener('DOMContentLoaded', function() {
         
         initializeAdmin();
     }, 100);
+    
+    // Also check periodically if admin section becomes visible (after login)
+    // This handles the case where user logs in after page load
+    let checkInterval = setInterval(function() {
+        const adminSection = document.getElementById('adminSection');
+        if (adminSection && adminSection.style.display !== 'none') {
+            if (typeof isAuthenticated === 'function' && isAuthenticated() && !adminInitialized) {
+                initializeAdmin();
+            }
+            // Stop checking once initialized
+            if (adminInitialized) {
+                clearInterval(checkInterval);
+            }
+        }
+    }, 500);
+    
+    // Stop checking after 10 seconds to avoid infinite loop
+    setTimeout(function() {
+        clearInterval(checkInterval);
+    }, 10000);
 });
 
 function initializeAdmin() {
+    // Prevent duplicate initialization
+    if (adminInitialized) {
+        // But still load shipments if manage tab is active
+        const manageTab = document.getElementById('manageTab');
+        if (manageTab && manageTab.classList.contains('active')) {
+            loadAllShipments();
+        }
+        return;
+    }
+    adminInitialized = true;
     
     // Tab switching
     const tabBtns = document.querySelectorAll('.tab-btn');
@@ -31,6 +63,11 @@ function initializeAdmin() {
             if (targetTab === 'create') {
                 currentTags = [];
                 updateTagsPreview('tagsPreview', []);
+            }
+            
+            // Load shipments when switching to manage tab
+            if (targetTab === 'manage') {
+                loadAllShipments();
             }
         });
     });
@@ -145,8 +182,11 @@ function initializeAdmin() {
         });
     }
     
-    // Load all shipments on manage tab
-    loadAllShipments();
+    // Load all shipments if manage tab is active
+    const manageTab = document.getElementById('manageTab');
+    if (manageTab && manageTab.classList.contains('active')) {
+        loadAllShipments();
+    }
 }
 
 // Tags management

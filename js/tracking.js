@@ -53,7 +53,14 @@ async function trackShipment(trackingNumber) {
         if (shipment) {
             errorDiv.style.display = 'none';
             resultDiv.style.display = 'block';
-            displayTrackingInfo(shipment);
+            // Ensure elements exist before displaying
+            if (document.getElementById('resultTrackingNumber') && document.getElementById('statusText')) {
+                displayTrackingInfo(shipment);
+            } else {
+                console.error('Tracking result elements not found in DOM');
+                errorDiv.style.display = 'block';
+                errorDiv.textContent = 'Error displaying tracking information. Please refresh the page.';
+            }
         } else {
             // Try case-insensitive search as fallback
             console.log('Shipment not found with exact match, trying case-insensitive search...');
@@ -65,7 +72,13 @@ async function trackShipment(trackingNumber) {
             if (foundShipment) {
                 errorDiv.style.display = 'none';
                 resultDiv.style.display = 'block';
-                displayTrackingInfo(foundShipment);
+                if (document.getElementById('resultTrackingNumber') && document.getElementById('statusText')) {
+                    displayTrackingInfo(foundShipment);
+                } else {
+                    console.error('Tracking result elements not found in DOM');
+                    errorDiv.style.display = 'block';
+                    errorDiv.textContent = 'Error displaying tracking information. Please refresh the page.';
+                }
             } else {
                 resultDiv.style.display = 'none';
                 errorDiv.style.display = 'block';

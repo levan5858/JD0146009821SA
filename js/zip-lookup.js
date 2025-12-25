@@ -132,39 +132,102 @@ async function searchZippopotam(postalCode) {
 // GeoNames place name search
 async function searchGeoNamesPlace(placeName) {
     try {
-        // Try with different search parameters
-        const queries = [
-            `q=${encodeURIComponent(placeName)}&maxRows=50&username=demo&featureClass=P`,
-            `name=${encodeURIComponent(placeName)}&maxRows=50&username=demo&featureClass=P`,
-            `name_startsWith=${encodeURIComponent(placeName)}&maxRows=50&username=demo&featureClass=P`
+        // Try multiple search strategies
+        const searchTerms = [
+            placeName,
+            placeName + ', USA',
+            placeName + ', United States',
+            placeName + ', US'
         ];
         
-        for (const query of queries) {
+        for (const term of searchTerms) {
             try {
-                const url = `https://secure.geonames.org/searchJSON?${query}`;
-                const response = await fetch(url);
+                // Try different query formats
+                const queries = [
+                    `q=${encodeURIComponent(term)}&maxRows=50&username=demo&featureClass=P&style=full`,
+                    `name=${encodeURIComponent(term)}&maxRows=50&username=demo&featureClass=P&style=full`,
+                    `name_equals=${encodeURIComponent(term)}&maxRows=50&username=demo&featureClass=P&style=full`
+                ];
                 
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.geonames && data.geonames.length > 0) {
-                        return data.geonames
-                            .filter(item => item.fcode && (item.fcode.startsWith('PPL') || item.fcode.startsWith('ADM')))
-                            .slice(0, 30)
-                            .map(item => ({
-                                code: item.postalCodes && item.postalCodes.length > 0 ? item.postalCodes[0] : 'N/A',
-                                city: item.name,
-                                state: item.adminName1 || '',
-                                country: item.countryCode,
-                                countryName: item.countryName,
-                                lat: item.lat,
-                                lng: item.lng
-                            }));
+                for (const query of queries) {
+                    try {
+                        const url = `https://secure.geonames.org/searchJSON?${query}`;
+                        const response = await fetch(url, {
+                            method: 'GET',
+                            headers: {
+                                'Accept': 'application/json'
+                            }
+                        });
+                        
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (data.geonames && data.geonames.length > 0) {
+                                const results = data.geonames
+                                    .filter(item => {
+                                        const fcode = item.fcode || '';
+                                        return fcode.startsWith('PPL') || 
+                                               fcode.startsWith('ADM') || 
+                                               fcode === 'PCLI' ||
+                                               item.population > 0;
+                                    })
+                                    .slice(0, 30)
+                                    .map(item => ({
+                                        code: (item.postalCodes && item.postalCodes.length > 0) ? item.postalCodes[0] : 
+                                              (item.postalcode ? item.postalcode : 'N/A'),
+                                        city: item.name,
+                                        state: item.adminName1 || item.adminName2 || '',
+                                        country: item.countryCode,
+                                        countryName: item.countryName,
+                                        lat: item.lat,
+                                        lng: item.lng
+                                    }));
+                                
+                                if (results.length > 0) {
+                                    return results;
+                                }
+                            }
+                        }
+                    } catch (error) {
+                        console.log('Query attempt failed:', error);
+                        continue;
                     }
                 }
             } catch (error) {
                 continue;
             }
         }
+        
+        // If no results, try a broader search without feature class restriction
+        try {
+            const url = `https://secure.geonames.org/searchJSON?q=${encodeURIComponent(placeName)}&maxRows=30&username=demo&style=full`;
+            const response = await fetch(url);
+            
+            if (response.ok) {
+                const data = await response.json();
+                if (data.geonames && data.geonames.length > 0) {
+                    return data.geonames
+                        .filter(item => {
+                            const name = (item.name || '').toLowerCase();
+                            const searchLower = placeName.toLowerCase();
+                            return name.includes(searchLower) || searchLower.includes(name);
+                        })
+                        .slice(0, 20)
+                        .map(item => ({
+                            code: (item.postalCodes && item.postalCodes.length > 0) ? item.postalCodes[0] : 
+                                  (item.postalcode ? item.postalcode : 'N/A'),
+                            city: item.name,
+                            state: item.adminName1 || item.adminName2 || '',
+                            country: item.countryCode,
+                            countryName: item.countryName,
+                            lat: item.lat,
+                            lng: item.lng
+                        }));
+                }
+            }
+        } catch (error) {
+            console.log('Broad search failed:', error);
+        }
+        
     } catch (error) {
         console.error('GeoNames place search error:', error);
     }
@@ -207,6 +270,41 @@ async function searchGeoNamesPostal(searchTerm) {
 function searchLocalDatabase(searchTerm) {
     const searchLower = searchTerm.toLowerCase();
     const results = [];
+    
+    // Common US cities that might not be in GeoNames
+    const usCities = {
+        'miami': { state: 'Florida', zip: '33101' },
+        'orlando': { state: 'Florida', zip: '32801' },
+        'tampa': { state: 'Florida', zip: '33601' },
+        'jacksonville': { state: 'Florida', zip: '32201' },
+        'atlanta': { state: 'Georgia', zip: '30301' },
+        'charlotte': { state: 'North Carolina', zip: '28201' },
+        'nashville': { state: 'Tennessee', zip: '37201' },
+        'austin': { state: 'Texas', zip: '78701' },
+        'dallas': { state: 'Texas', zip: '75201' },
+        'houston': { state: 'Texas', zip: '77001' },
+        'phoenix': { state: 'Arizona', zip: '85001' },
+        'denver': { state: 'Colorado', zip: '80201' },
+        'seattle': { state: 'Washington', zip: '98101' },
+        'portland': { state: 'Oregon', zip: '97201' },
+        'las vegas': { state: 'Nevada', zip: '89101' }
+    };
+    
+    // Check US cities first
+    Object.keys(usCities).forEach(city => {
+        if (city.includes(searchLower) || searchLower.includes(city)) {
+            const cityData = usCities[city];
+            results.push({
+                code: cityData.zip,
+                city: city.charAt(0).toUpperCase() + city.slice(1),
+                state: cityData.state,
+                country: 'US',
+                countryName: 'United States',
+                lat: '',
+                lng: ''
+            });
+        }
+    });
     
     // Search through our countries data
     const countries = getAllCountries();

@@ -84,20 +84,28 @@ async function trackShipment(trackingNumber) {
 function showLoadingSpinner(containerId) {
     const container = document.getElementById(containerId);
     if (container) {
-        container.innerHTML = `
-            <div class="loading-container">
-                <div class="spinner"></div>
-                <p>Loading shipment information...</p>
-            </div>
-        `;
+        // Create loading overlay that doesn't replace content
+        let loadingOverlay = container.querySelector('.loading-overlay');
+        if (!loadingOverlay) {
+            loadingOverlay = document.createElement('div');
+            loadingOverlay.className = 'loading-overlay';
+            loadingOverlay.innerHTML = `
+                <div class="loading-container">
+                    <div class="spinner"></div>
+                    <p>Loading shipment information...</p>
+                </div>
+            `;
+            container.appendChild(loadingOverlay);
+        }
+        loadingOverlay.style.display = 'flex';
         container.style.display = 'block';
     }
 }
 
 function hideLoadingSpinner() {
-    const loadingContainers = document.querySelectorAll('.loading-container');
-    loadingContainers.forEach(container => {
-        container.remove();
+    const loadingOverlays = document.querySelectorAll('.loading-overlay');
+    loadingOverlays.forEach(overlay => {
+        overlay.style.display = 'none';
     });
 }
 

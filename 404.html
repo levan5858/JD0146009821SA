@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Page Not Found | AL SAHRA PRECIOUS METALS</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/svg+xml" href="logo.svg">
+    <script>
+        // Redirect old .html URLs to clean URLs
+        (function() {
+            const path = window.location.pathname;
+            const cleanPath = path.replace(/\.html$/, '').replace(/\/$/, '');
+            
+            // Map old .html URLs to clean URLs
+            const redirectMap = {
+                '/tracking.html': '/tracking',
+                '/admin.html': '/admin',
+                '/contact.html': '/contact',
+                '/zip-lookup.html': '/zip-lookup',
+                '/calculate-price.html': '/calculate-price',
+                '/schedule-pickup.html': '/schedule-pickup'
+            };
+            
+            // Check if this is an old .html URL that should be redirected
+            if (redirectMap[path]) {
+                window.location.replace(redirectMap[path] + window.location.search + window.location.hash);
+                return;
+            }
+            
+            // If path ends with .html, try to redirect to clean URL
+            if (path.endsWith('.html')) {
+                window.location.replace(cleanPath + window.location.search + window.location.hash);
+                return;
+            }
+        })();
+    </script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <a href="/" class="logo-link">
+                <div class="logo">
+                    <img src="logo.svg" alt="AL SAHRA Logo" class="logo-img">
+                    <div class="logo-text">
+                        <h1>AL SAHRA PRECIOUS METALS & LOGISTICS</h1>
+                        <p class="tagline">خدمات الشحن والتوصيل الموثوقة</p>
+                    </div>
+                </div>
+            </a>
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="/">الرئيسية</a></li>
+                    <li><a href="/tracking">تتبع الشحنة</a></li>
+                    <li><a href="/contact">اتصل بنا</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero" style="min-height: 60vh; display: flex; align-items: center; justify-content: center;">
+            <div class="container" style="text-align: center;">
+                <h1 style="font-size: 4rem; margin-bottom: 1rem;">404</h1>
+                <h2 style="margin-bottom: 1rem;">الصفحة غير موجودة</h2>
+                <p style="margin-bottom: 2rem;">عذراً، الصفحة التي تبحث عنها غير موجودة.</p>
+                <a href="/" style="display: inline-block; padding: 1rem 2rem; background-color: var(--primary-green); color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">العودة إلى الصفحة الرئيسية</a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2025 AL SAHRA PRECIOUS METALS & LOGISTICS LLC. جميع الحقوق محفوظة.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
+

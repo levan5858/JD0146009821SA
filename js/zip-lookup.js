@@ -1,4 +1,4 @@
-// ZIP code lookup functionality - Real-time API integration
+// ZIP code lookup functionality - Real-time API integration with multiple fallbacks
 
 document.addEventListener('DOMContentLoaded', function() {
     const zipForm = document.getElementById('zipLookupForm');
@@ -33,7 +33,6 @@ async function searchZip(searchTerm) {
     const resultsDiv = document.getElementById('zipResults');
     const errorDiv = document.getElementById('zipError');
     const resultsList = document.getElementById('zipResultsList');
-    const searchInput = document.getElementById('zipSearchInput');
     
     // Hide previous results
     resultsDiv.style.display = 'none';
@@ -41,31 +40,38 @@ async function searchZip(searchTerm) {
     
     // Show loading state
     if (resultsList) {
-        resultsList.innerHTML = '<div class="loading-spinner">Searching...</div>';
+        resultsList.innerHTML = '<div class="loading-spinner">Searching worldwide database...</div>';
         resultsDiv.style.display = 'block';
     }
     
     try {
-        // Try multiple search strategies
         let results = [];
         
-        // Strategy 1: Search by postal code directly (if it looks like a postal code)
-        if (/^\d+[-\s]?\d*$/.test(searchTerm)) {
-            results = await searchByPostalCode(searchTerm);
+        // Strategy 1: Try Zippopotam.us API (free, no auth needed) for postal codes
+        if (/^\d{3,10}$/.test(searchTerm.replace(/[-\s]/g, ''))) {
+            results = await searchZippopotam(searchTerm);
         }
         
-        // Strategy 2: Search by place name (city/country)
+        // Strategy 2: Use GeoNames API for place names
         if (results.length === 0) {
-            results = await searchByPlaceName(searchTerm);
+            results = await searchGeoNamesPlace(searchTerm);
         }
         
-        // Strategy 3: Use GeoNames API for comprehensive search
+        // Strategy 3: Use GeoNames postal code search
         if (results.length === 0) {
-            results = await searchGeoNames(searchTerm);
+            results = await searchGeoNamesPostal(searchTerm);
+        }
+        
+        // Strategy 4: Fallback to our local database
+        if (results.length === 0) {
+            results = searchLocalDatabase(searchTerm);
         }
         
         if (results.length === 0) {
-            errorDiv.textContent = translations[lang].zipNotFound || 'No results found. Try a different search term.';
+            errorDiv.innerHTML = `
+                <p>${translations[lang].zipNotFound || 'No results found.'}</p>
+                <p style="margin-top: 0.5rem; font-size: 0.9rem;">Try searching with: city name, state/province, country, or postal code</p>
+            `;
             errorDiv.style.display = 'block';
             resultsDiv.style.display = 'none';
             return;
@@ -76,92 +82,169 @@ async function searchZip(searchTerm) {
         
     } catch (error) {
         console.error('Error searching ZIP codes:', error);
-        errorDiv.textContent = translations[lang].zipSearchError || 'Error searching. Please try again.';
+        errorDiv.innerHTML = `
+            <p>${translations[lang].zipSearchError || 'Error searching. Please try again.'}</p>
+            <p style="margin-top: 0.5rem; font-size: 0.9rem;">You can try: "Miami, Florida, USA" or "10001" or "New York"</p>
+        `;
         errorDiv.style.display = 'block';
         resultsDiv.style.display = 'none';
     }
 }
 
-async function searchByPostalCode(postalCode) {
-    // Use GeoNames postal code search API
+// Zippopotam.us API - Free, no authentication needed
+async function searchZippopotam(postalCode) {
     const cleanCode = postalCode.replace(/[-\s]/g, '');
-    const url = `https://secure.geonames.org/postalCodeSearchJSON?postalcode=${encodeURIComponent(cleanCode)}&maxRows=50&username=demo`;
-    
-    try {
-        const response = await fetch(url);
-        const data = await response.json();
-        
-        if (data.postalCodes && data.postalCodes.length > 0) {
-            return data.postalCodes.map(item => ({
-                code: item.postalCode,
-                city: item.placeName,
-                state: item.adminName1 || '',
-                country: item.countryCode,
-                countryName: getCountryNameFromCode(item.countryCode),
-                lat: item.lat,
-                lng: item.lng
-            }));
-        }
-    } catch (error) {
-        console.error('GeoNames API error:', error);
-    }
-    
-    return [];
-}
-
-async function searchByPlaceName(placeName) {
-    // Use GeoNames search API
-    const url = `https://secure.geonames.org/searchJSON?q=${encodeURIComponent(placeName)}&maxRows=50&username=demo&featureClass=P`;
-    
-    try {
-        const response = await fetch(url);
-        const data = await response.json();
-        
-        if (data.geonames && data.geonames.length > 0) {
-            return data.geonames
-                .filter(item => item.fcode && (item.fcode.startsWith('PPL') || item.fcode.startsWith('ADM')))
-                .map(item => ({
-                    code: item.postalCodes ? item.postalCodes[0] : 'N/A',
-                    city: item.name,
-                    state: item.adminName1 || '',
-                    country: item.countryCode,
-                    countryName: item.countryName,
-                    lat: item.lat,
-                    lng: item.lng
-                }));
-        }
-    } catch (error) {
-        console.error('GeoNames search error:', error);
-    }
-    
-    return [];
-}
-
-async function searchGeoNames(searchTerm) {
-    // Comprehensive search using GeoNames
     const results = [];
     
-    // Try postal code search
-    const postalResults = await searchByPostalCode(searchTerm);
-    results.push(...postalResults);
+    // Try common country codes
+    const countries = ['us', 'ca', 'gb', 'au', 'de', 'fr', 'it', 'es', 'nl', 'be', 'ch', 'at', 'se', 'no', 'dk', 'fi'];
     
-    // Try place name search
-    const placeResults = await searchByPlaceName(searchTerm);
-    results.push(...placeResults);
+    for (const country of countries) {
+        try {
+            const url = `https://api.zippopotam.us/${country}/${cleanCode}`;
+            const response = await fetch(url);
+            
+            if (response.ok) {
+                const data = await response.json();
+                if (data.places && data.places.length > 0) {
+                    data.places.forEach(place => {
+                        results.push({
+                            code: data['post code'],
+                            city: place['place name'],
+                            state: place['state'] || place['state abbreviation'] || '',
+                            country: data.country,
+                            countryName: getCountryNameFromCode(data.country),
+                            lat: place.latitude || '',
+                            lng: place.longitude || ''
+                        });
+                    });
+                }
+            }
+        } catch (error) {
+            // Continue to next country
+            continue;
+        }
+    }
     
-    // Remove duplicates
-    const uniqueResults = [];
-    const seen = new Set();
+    return results;
+}
+
+// GeoNames place name search
+async function searchGeoNamesPlace(placeName) {
+    try {
+        // Try with different search parameters
+        const queries = [
+            `q=${encodeURIComponent(placeName)}&maxRows=50&username=demo&featureClass=P`,
+            `name=${encodeURIComponent(placeName)}&maxRows=50&username=demo&featureClass=P`,
+            `name_startsWith=${encodeURIComponent(placeName)}&maxRows=50&username=demo&featureClass=P`
+        ];
+        
+        for (const query of queries) {
+            try {
+                const url = `https://secure.geonames.org/searchJSON?${query}`;
+                const response = await fetch(url);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.geonames && data.geonames.length > 0) {
+                        return data.geonames
+                            .filter(item => item.fcode && (item.fcode.startsWith('PPL') || item.fcode.startsWith('ADM')))
+                            .slice(0, 30)
+                            .map(item => ({
+                                code: item.postalCodes && item.postalCodes.length > 0 ? item.postalCodes[0] : 'N/A',
+                                city: item.name,
+                                state: item.adminName1 || '',
+                                country: item.countryCode,
+                                countryName: item.countryName,
+                                lat: item.lat,
+                                lng: item.lng
+                            }));
+                    }
+                }
+            } catch (error) {
+                continue;
+            }
+        }
+    } catch (error) {
+        console.error('GeoNames place search error:', error);
+    }
     
-    results.forEach(result => {
-        const key = `${result.city}-${result.country}`;
-        if (!seen.has(key)) {
-            seen.add(key);
-            uniqueResults.push(result);
+    return [];
+}
+
+// GeoNames postal code search
+async function searchGeoNamesPostal(searchTerm) {
+    // If it looks like a postal code, search directly
+    const cleanCode = searchTerm.replace(/[-\s]/g, '');
+    if (/^\d+$/.test(cleanCode)) {
+        try {
+            const url = `https://secure.geonames.org/postalCodeSearchJSON?postalcode=${encodeURIComponent(cleanCode)}&maxRows=50&username=demo`;
+            const response = await fetch(url);
+            
+            if (response.ok) {
+                const data = await response.json();
+                if (data.postalCodes && data.postalCodes.length > 0) {
+                    return data.postalCodes.map(item => ({
+                        code: item.postalCode,
+                        city: item.placeName,
+                        state: item.adminName1 || '',
+                        country: item.countryCode,
+                        countryName: getCountryNameFromCode(item.countryCode),
+                        lat: item.lat,
+                        lng: item.lng
+                    }));
+                }
+            }
+        } catch (error) {
+            console.error('GeoNames postal search error:', error);
+        }
+    }
+    
+    return [];
+}
+
+// Fallback to local database
+function searchLocalDatabase(searchTerm) {
+    const searchLower = searchTerm.toLowerCase();
+    const results = [];
+    
+    // Search through our countries data
+    const countries = getAllCountries();
+    countries.forEach(country => {
+        // Check if country matches
+        if (country.toLowerCase().includes(searchLower)) {
+            const cities = getCitiesForCountry(country);
+            cities.forEach(city => {
+                results.push({
+                    code: 'N/A',
+                    city: city,
+                    state: '',
+                    country: country,
+                    countryName: country,
+                    lat: '',
+                    lng: ''
+                });
+            });
+        } else {
+            // Check cities
+            const cities = getCitiesForCountry(country);
+            cities.forEach(city => {
+                if (city.toLowerCase().includes(searchLower)) {
+                    results.push({
+                        code: 'N/A',
+                        city: city,
+                        state: '',
+                        country: country,
+                        countryName: country,
+                        lat: '',
+                        lng: ''
+                    });
+                }
+            });
         }
     });
     
-    return uniqueResults.slice(0, 50); // Limit to 50 results
+    return results.slice(0, 30);
 }
 
 function getCountryNameFromCode(code) {
@@ -173,7 +256,8 @@ function getCountryNameFromCode(code) {
         'BE': 'Belgium', 'SE': 'Sweden', 'CH': 'Switzerland', 'AT': 'Austria', 'NO': 'Norway', 'DK': 'Denmark',
         'FI': 'Finland', 'IE': 'Ireland', 'PT': 'Portugal', 'GR': 'Greece', 'CZ': 'Czech Republic', 'RO': 'Romania',
         'HU': 'Hungary', 'BG': 'Bulgaria', 'HR': 'Croatia', 'SK': 'Slovakia', 'SI': 'Slovenia', 'LT': 'Lithuania',
-        'LV': 'Latvia', 'EE': 'Estonia', 'LU': 'Luxembourg', 'MT': 'Malta', 'CY': 'Cyprus', 'IS': 'Iceland'
+        'LV': 'Latvia', 'EE': 'Estonia', 'LU': 'Luxembourg', 'MT': 'Malta', 'CY': 'Cyprus', 'IS': 'Iceland',
+        'NZ': 'New Zealand', 'SG': 'Singapore', 'MY': 'Malaysia', 'TH': 'Thailand', 'VN': 'Vietnam', 'PH': 'Philippines'
     };
     return countryCodes[code] || code;
 }
@@ -186,7 +270,19 @@ function displayZipResults(results) {
     
     resultsList.innerHTML = '';
     
+    // Remove duplicates
+    const uniqueResults = [];
+    const seen = new Set();
+    
     results.forEach(item => {
+        const key = `${item.city}-${item.country}-${item.code}`;
+        if (!seen.has(key)) {
+            seen.add(key);
+            uniqueResults.push(item);
+        }
+    });
+    
+    uniqueResults.slice(0, 50).forEach(item => {
         const resultItem = document.createElement('div');
         resultItem.className = 'zip-result-item';
         
@@ -199,20 +295,20 @@ function displayZipResults(results) {
             <div class="zip-details">
                 <strong>${item.city}</strong>
                 <span>${locationParts.join(', ')}</span>
-                ${item.lat && item.lng ? `<small class="zip-coords">📍 ${item.lat.toFixed(4)}, ${item.lng.toFixed(4)}</small>` : ''}
+                ${item.lat && item.lng ? `<small class="zip-coords">📍 ${parseFloat(item.lat).toFixed(4)}, ${parseFloat(item.lng).toFixed(4)}</small>` : ''}
             </div>
         `;
         resultsList.appendChild(resultItem);
     });
     
-    if (results.length >= 50) {
+    if (uniqueResults.length >= 50) {
         const moreItem = document.createElement('div');
         moreItem.className = 'zip-result-item';
         moreItem.style.textAlign = 'center';
         moreItem.style.padding = '1rem';
         moreItem.style.fontStyle = 'italic';
         moreItem.style.color = 'var(--text-light)';
-        moreItem.innerHTML = `Showing 50 results. Try a more specific search for better results.`;
+        moreItem.innerHTML = `Showing 50 of ${uniqueResults.length} results. Try a more specific search for better results.`;
         resultsList.appendChild(moreItem);
     }
     

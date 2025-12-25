@@ -69,7 +69,8 @@ const database = {
     async updateShipment(trackingNumber, shipment) {
         if (useFirebase) {
             try {
-                await window.db.collection('shipments').doc(trackingNumber).update(shipment);
+                // Use set with merge to properly update arrays
+                await window.db.collection('shipments').doc(trackingNumber).set(shipment, { merge: false });
                 return true;
             } catch (error) {
                 console.error('Error updating shipment:', error);

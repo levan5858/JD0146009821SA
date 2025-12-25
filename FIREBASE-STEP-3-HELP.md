@@ -94,3 +94,4 @@ If you can't see the config:
 **Once you have the config values, paste them into `js/firebase-config.js` and you're done with Step 3!**
 
 
+

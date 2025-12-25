@@ -59,11 +59,10 @@ function displayTrackingInfo(shipment) {
     const lastStatus = shipment.statusHistory[shipment.statusHistory.length - 1];
     document.getElementById('statusText').textContent = statusMap[lastStatus.status] || lastStatus.status;
     
-    // Display timeline
+    // Display timeline with all statuses in chronological order
     const timeline = document.getElementById('timeline');
     timeline.innerHTML = '';
     
-    const statusOrder = ['pending', 'picked_up', 'in_transit', 'out_for_delivery', 'delivered'];
     const statusLabels = {
         'pending': translations[lang].statusPending,
         'picked_up': translations[lang].statusPickedUp,
@@ -73,41 +72,64 @@ function displayTrackingInfo(shipment) {
         'exception': translations[lang].statusException
     };
     
-    const completedStatuses = shipment.statusHistory.map(s => s.status);
-    const currentStatus = lastStatus.status;
-    
-    statusOrder.forEach((status, index) => {
-        const isCompleted = completedStatuses.includes(status);
-        const isActive = status === currentStatus;
-        
-        if (isCompleted || isActive) {
-            const statusItem = shipment.statusHistory.find(s => s.status === status);
-            if (statusItem) {
-                const item = document.createElement('div');
-                item.className = `timeline-item ${isCompleted ? 'completed' : ''} ${isActive ? 'active' : ''}`;
-                
-                const date = new Date(statusItem.dateTime);
-                const locale = lang === 'ar' ? 'ar-SA' : 'en-US';
-                const formattedDate = date.toLocaleDateString(locale, {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-                
-                item.innerHTML = `
-                    <div class="timeline-content">
-                        <h4>${statusLabels[status] || status}</h4>
-                        <p><strong>${translations[lang].location}:</strong> ${statusItem.location}</p>
-                        <p><strong>${translations[lang].date}:</strong> ${formattedDate}</p>
-                        ${statusItem.notes ? `<p><strong>${translations[lang].notes}:</strong> ${statusItem.notes}</p>` : ''}
-                    </div>
-                `;
-                timeline.appendChild(item);
-            }
-        }
+    // Sort status history by date (oldest first)
+    const sortedHistory = [...shipment.statusHistory].sort((a, b) => {
+        return new Date(a.dateTime) - new Date(b.dateTime);
     });
+    
+    // Calculate progress percentage for animation
+    const totalSteps = sortedHistory.length;
+    let currentStep = 0;
+    
+    // Display all statuses in chronological order
+    sortedHistory.forEach((statusItem, index) => {
+        const isLast = index === sortedHistory.length - 1;
+        const item = document.createElement('div');
+        item.className = `timeline-item ${isLast ? 'active' : 'completed'}`;
+        item.setAttribute('data-step', index);
+        
+        const date = new Date(statusItem.dateTime);
+        const locale = lang === 'ar' ? 'ar-SA' : 'en-US';
+        const formattedDate = date.toLocaleDateString(locale, {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        
+        item.innerHTML = `
+            <div class="timeline-content">
+                <h4>${statusLabels[statusItem.status] || statusItem.status}</h4>
+                <p><strong>${translations[lang].location}:</strong> ${statusItem.location}</p>
+                <p><strong>${translations[lang].date}:</strong> ${formattedDate}</p>
+                ${statusItem.notes ? `<p><strong>${translations[lang].notes}:</strong> ${statusItem.notes}</p>` : ''}
+            </div>
+        `;
+        timeline.appendChild(item);
+        currentStep = index;
+    });
+    
+    // Add animated ship icon
+    if (sortedHistory.length > 0 && timeline.children.length > 0) {
+        const lastItem = timeline.children[timeline.children.length - 1];
+        const shipIcon = document.createElement('div');
+        shipIcon.className = 'ship-animation animate';
+        shipIcon.innerHTML = '🚢';
+        
+        // Position ship at the last status item
+        const timelineRect = timeline.getBoundingClientRect();
+        const itemRect = lastItem.getBoundingClientRect();
+        
+        if (document.body.classList.contains('rtl')) {
+            shipIcon.style.right = '30px';
+        } else {
+            shipIcon.style.left = '30px';
+        }
+        shipIcon.style.top = (itemRect.top - timelineRect.top + 10) + 'px';
+        
+        timeline.appendChild(shipIcon);
+    }
     
     // Display shipment details
     const detailsDiv = document.getElementById('shipmentDetails');

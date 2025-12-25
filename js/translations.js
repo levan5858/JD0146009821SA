@@ -90,6 +90,9 @@ const translations = {
         alertTrackingExists: "رقم التتبع موجود بالفعل",
         alertCreated: "تم إنشاء الشحنة بنجاح!",
         alertUpdated: "تم تحديث حالة الشحنة بنجاح!",
+        editDescriptionTitle: "تعديل وصف الشحنة",
+        saveDescription: "حفظ الوصف",
+        statusNote: "يمكنك اختيار أي حالة، حتى العودة إلى حالة سابقة",
         
         // Footer
         companyInfo: "معلومات الشركة",
@@ -201,6 +204,9 @@ const translations = {
         alertTrackingExists: "Tracking number already exists",
         alertCreated: "Shipment created successfully!",
         alertUpdated: "Shipment status updated successfully!",
+        editDescriptionTitle: "Edit Shipment Description",
+        saveDescription: "Save Description",
+        statusNote: "You can select any status, including reverting to a previous status",
         
         // Footer
         companyInfo: "Company Information",

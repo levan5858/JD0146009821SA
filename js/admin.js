@@ -53,19 +53,30 @@ function initializeAdmin() {
         });
     }
     
-    // Modal close
-    const closeModal = document.querySelector('.close-modal');
-    if (closeModal) {
-        closeModal.addEventListener('click', function() {
-            document.getElementById('editShipmentModal').style.display = 'none';
+    // Modal close buttons
+    const closeModals = document.querySelectorAll('.close-modal');
+    closeModals.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const statusModal = document.getElementById('editShipmentModal');
+            const descModal = document.getElementById('editDescriptionModal');
+            if (statusModal && statusModal.style.display !== 'none') {
+                statusModal.style.display = 'none';
+            }
+            if (descModal && descModal.style.display !== 'none') {
+                descModal.style.display = 'none';
+            }
         });
-    }
+    });
     
     // Close modal when clicking outside
     window.addEventListener('click', function(e) {
-        const modal = document.getElementById('editShipmentModal');
-        if (e.target === modal) {
-            modal.style.display = 'none';
+        const statusModal = document.getElementById('editShipmentModal');
+        const descModal = document.getElementById('editDescriptionModal');
+        if (e.target === statusModal) {
+            statusModal.style.display = 'none';
+        }
+        if (e.target === descModal) {
+            descModal.style.display = 'none';
         }
     });
     
@@ -75,6 +86,15 @@ function initializeAdmin() {
         updateForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             await updateShipmentStatus();
+        });
+    }
+    
+    // Update description form
+    const updateDescForm = document.getElementById('updateDescriptionForm');
+    if (updateDescForm) {
+        updateDescForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            await updateShipmentDescription();
         });
     }
     
@@ -209,12 +229,16 @@ function displayShipment(shipment) {
     item.innerHTML = `
         <div class="shipment-item-header">
             <h4>${shipment.trackingNumber}</h4>
-            <button class="btn-edit" onclick="openEditModal('${shipment.trackingNumber}')">${translations[lang].editStatus}</button>
+            <div class="shipment-actions">
+                <button class="btn-edit" onclick="openEditModal('${shipment.trackingNumber}')">${translations[lang].editStatus}</button>
+                <button class="btn-edit-description" onclick="openEditDescriptionModal('${shipment.trackingNumber}')">${translations[lang].editDescription || 'Edit Description'}</button>
+            </div>
         </div>
         <p><strong>${translations[lang].currentStatus}</strong> ${statusText}</p>
         <p><strong>${translations[lang].sender}:</strong> ${shipment.senderName}</p>
         <p><strong>${translations[lang].recipient}:</strong> ${shipment.recipientName}</p>
         <p><strong>${translations[lang].weight}:</strong> ${shipment.weight} ${weightUnit}</p>
+        ${shipment.description ? `<p><strong>${translations[lang].description}:</strong> ${shipment.description}</p>` : ''}
         <p><strong>${translations[lang].updateCount}</strong> ${shipment.statusHistory.length}</p>
     `;
     
@@ -276,12 +300,23 @@ async function updateShipmentStatus() {
         return;
     }
     
-    // Add new status
+    // If going back to a previous status (like pending), require notes/explanation
+    const lastStatus = shipment.statusHistory[shipment.statusHistory.length - 1];
+    const statusOrder = ['pending', 'picked_up', 'in_transit', 'out_for_delivery', 'delivered'];
+    const lastIndex = statusOrder.indexOf(lastStatus.status);
+    const newIndex = statusOrder.indexOf(newStatus);
+    
+    if (newIndex < lastIndex && !notes.trim()) {
+        alert('يرجى إدخال سبب العودة إلى حالة سابقة / Please provide a reason for reverting to a previous status');
+        return;
+    }
+    
+    // Add new status (can be any status, including going back)
     shipment.statusHistory.push({
         status: newStatus,
         location: location,
         dateTime: new Date(dateTime).toISOString(),
-        notes: notes
+        notes: notes || (newIndex < lastIndex ? 'Returned to previous status' : '')
     });
     
     // Update in database
@@ -317,6 +352,64 @@ async function updateShipmentStatus() {
     }
 }
 
-// Make openEditModal available globally
+async function openEditDescriptionModal(trackingNumber) {
+    const shipment = await database.getShipment(trackingNumber);
+    
+    if (!shipment) {
+        alert('Shipment not found');
+        return;
+    }
+    
+    document.getElementById('editDescriptionModal').setAttribute('data-tracking', trackingNumber);
+    document.getElementById('editDescriptionText').value = shipment.description || '';
+    document.getElementById('editDescriptionModal').style.display = 'block';
+}
+
+async function updateShipmentDescription() {
+    const lang = currentLang || 'ar';
+    const modal = document.getElementById('editDescriptionModal');
+    const trackingNumber = modal.getAttribute('data-tracking');
+    
+    if (!trackingNumber) return;
+    
+    const shipment = await database.getShipment(trackingNumber);
+    if (!shipment) return;
+    
+    const newDescription = document.getElementById('editDescriptionText').value.trim();
+    shipment.description = newDescription;
+    
+    try {
+        const updated = await database.updateShipment(trackingNumber, shipment);
+        
+        if (updated) {
+            alert(translations[lang].alertUpdated || 'Description updated successfully!');
+            modal.style.display = 'none';
+            
+            // Refresh the list
+            const searchInput = document.getElementById('searchTracking');
+            if (searchInput && searchInput.value.trim()) {
+                await searchShipment();
+            } else {
+                await loadAllShipments();
+            }
+        }
+    } catch (error) {
+        console.error('Error updating description:', error);
+        alert('Error updating description: ' + error.message);
+    }
+}
+
+function closeEditModal() {
+    document.getElementById('editShipmentModal').style.display = 'none';
+}
+
+function closeEditDescriptionModal() {
+    document.getElementById('editDescriptionModal').style.display = 'none';
+}
+
+// Make functions available globally
 window.openEditModal = openEditModal;
+window.openEditDescriptionModal = openEditDescriptionModal;
+window.closeEditModal = closeEditModal;
+window.closeEditDescriptionModal = closeEditDescriptionModal;
 

@@ -118,7 +118,7 @@
 
                     <div id="editShipmentModal" class="modal" style="display: none;">
                         <div class="modal-content">
-                            <span class="close-modal">&times;</span>
+                            <span class="close-modal" onclick="closeEditModal()">&times;</span>
                             <h3 data-i18n="editStatusTitle">تعديل حالة الشحنة</h3>
                             <form id="updateStatusForm">
                                 <div class="form-group">
@@ -131,6 +131,7 @@
                                         <option value="delivered" data-i18n="statusDelivered">تم التسليم</option>
                                         <option value="exception" data-i18n="statusException">استثناء</option>
                                     </select>
+                                    <small style="color: #666; display: block; margin-top: 0.5rem;" data-i18n="statusNote">يمكنك اختيار أي حالة، حتى العودة إلى حالة سابقة</small>
                                 </div>
                                 <div class="form-group">
                                     <label data-i18n="labelLocation">الموقع:</label>
@@ -141,10 +142,24 @@
                                     <input type="datetime-local" id="statusDateTime" required>
                                 </div>
                                 <div class="form-group">
-                                    <label data-i18n="labelNotes">ملاحظات:</label>
-                                    <textarea id="statusNotes"></textarea>
+                                    <label data-i18n="labelNotes">ملاحظات (مطلوب للعودة إلى حالة سابقة):</label>
+                                    <textarea id="statusNotes" placeholder="أدخل السبب أو التفاصيل"></textarea>
                                 </div>
                                 <button type="submit" class="btn-primary" data-i18n="addStatusButton">إضافة الحالة</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div id="editDescriptionModal" class="modal" style="display: none;">
+                        <div class="modal-content">
+                            <span class="close-modal" onclick="closeEditDescriptionModal()">&times;</span>
+                            <h3 data-i18n="editDescriptionTitle">تعديل وصف الشحنة</h3>
+                            <form id="updateDescriptionForm">
+                                <div class="form-group">
+                                    <label data-i18n="labelDescription">وصف الشحنة:</label>
+                                    <textarea id="editDescriptionText" rows="5"></textarea>
+                                </div>
+                                <button type="submit" class="btn-primary" data-i18n="saveDescription">حفظ الوصف</button>
                             </form>
                         </div>
                     </div>

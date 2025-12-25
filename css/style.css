@@ -1415,6 +1415,17 @@ footer {
     color: var(--text-light);
 }
 
+.search-info {
+    background: var(--lighter-green);
+    padding: 1.5rem;
+    border-radius: 10px;
+    margin-top: 2rem;
+    text-align: center;
+    color: var(--primary-green);
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
 .zip-results {
     background: var(--white);
     padding: 2rem;

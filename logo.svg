@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- Background Circle -->
+  <circle cx="100" cy="100" r="95" fill="#2d5016" stroke="#4a7c2a" stroke-width="3"/>
+  
+  <!-- Precious Metal Symbol (Diamond/Hexagon) -->
+  <polygon points="100,40 130,60 130,90 100,110 70,90 70,60" fill="#8bc34a" stroke="#a5d75f" stroke-width="2"/>
+  
+  <!-- Logistics Arrow/Truck Symbol -->
+  <g transform="translate(100, 140)">
+    <!-- Truck body -->
+    <rect x="-35" y="-15" width="50" height="20" fill="#6b9f3d" rx="3"/>
+    <!-- Truck cabin -->
+    <rect x="-50" y="-12" width="18" height="14" fill="#8bc34a" rx="2"/>
+    <!-- Wheels -->
+    <circle cx="-30" cy="8" r="6" fill="#1a1a1a"/>
+    <circle cx="-5" cy="8" r="6" fill="#1a1a1a"/>
+    <!-- Wheel rims -->
+    <circle cx="-30" cy="8" r="3" fill="#4a7c2a"/>
+    <circle cx="-5" cy="8" r="3" fill="#4a7c2a"/>
+  </g>
+  
+  <!-- Company Initials -->
+  <text x="100" y="185" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#8bc34a" text-anchor="middle">ASPM</text>
+</svg>
+
+

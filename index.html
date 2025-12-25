@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="pageTitle">AL SAHRA PRECIOUS METALS & LOGISTICS LLC - Track Your Shipment</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/svg+xml" href="logo.svg">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <img src="logo.svg" alt="AL SAHRA Logo" class="logo-img">
+                <div class="logo-text">
+                    <h1>AL SAHRA PRECIOUS METALS & LOGISTICS</h1>
+                    <p class="tagline" data-i18n="tagline">خدمات الشحن والتوصيل الموثوقة</p>
+                </div>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html" class="active" data-i18n="navHome">الرئيسية</a></li>
+                    <li><a href="tracking.html" data-i18n="navTracking">تتبع الشحنة</a></li>
+                    <li><a href="admin.html" data-i18n="navAdmin">لوحة التحكم</a></li>
+                </ul>
+                <div class="language-switcher">
+                    <button class="lang-btn" onclick="setLanguage('ar')" id="lang-ar">العربية</button>
+                    <button class="lang-btn" onclick="setLanguage('en')" id="lang-en">English</button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h2 data-i18n="heroTitle">تتبع شحنتك بسهولة</h2>
+                <p data-i18n="heroSubtitle">أدخل رقم التتبع الخاص بك للحصول على آخر تحديثات شحنتك</p>
+                <form class="track-form" id="trackForm" action="tracking.html" method="get">
+                    <input type="text" id="trackingNumber" name="track" data-i18n="trackPlaceholder" placeholder="أدخل رقم التتبع" required>
+                    <button type="submit" data-i18n="trackButton">تتبع</button>
+                </form>
+            </div>
+        </section>
+
+        <section class="services">
+            <div class="container">
+                <h2 data-i18n="servicesTitle">خدماتنا</h2>
+                <div class="services-grid">
+                    <div class="service-card">
+                        <div class="icon">📦</div>
+                        <h3 data-i18n="serviceFast">شحن سريع</h3>
+                        <p data-i18n="serviceFastDesc">خدمة شحن سريعة وآمنة داخل المملكة العربية السعودية</p>
+                    </div>
+                    <div class="service-card">
+                        <div class="icon">🌍</div>
+                        <h3 data-i18n="serviceInternational">شحن دولي</h3>
+                        <p data-i18n="serviceInternationalDesc">نقل البضائع الثمينة والمعادن إلى جميع أنحاء العالم</p>
+                    </div>
+                    <div class="service-card">
+                        <div class="icon">🔒</div>
+                        <h3 data-i18n="serviceSecure">أمان مضمون</h3>
+                        <p data-i18n="serviceSecureDesc">حماية كاملة لشحناتك مع تأمين شامل</p>
+                    </div>
+                    <div class="service-card">
+                        <div class="icon">📱</div>
+                        <h3 data-i18n="serviceRealTime">تتبع مباشر</h3>
+                        <p data-i18n="serviceRealTimeDesc">تتبع شحنتك في الوقت الفعلي من أي مكان</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="about">
+            <div class="container">
+                <h2 data-i18n="aboutTitle">من نحن</h2>
+                <p data-i18n="aboutText">AL SAHRA PRECIOUS METALS & LOGISTICS LLC هي شركة رائدة في مجال الشحن والخدمات اللوجستية في المملكة العربية السعودية. نحن متخصصون في نقل المعادن الثمينة والبضائع عالية القيمة بأعلى معايير الأمان والجودة.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3 data-i18n="companyInfo">معلومات الشركة</h3>
+                    <p><strong>AL SAHRA PRECIOUS METALS & LOGISTICS LLC</strong></p>
+                    <p data-i18n="addressArabic">طريق الملك فهد، حي العليا</p>
+                    <p>King Fahd Road, Al Olaya District</p>
+                    <p><span data-i18n="crNumber">الرقم الموحد:</span> 1010894457</p>
+                </div>
+                <div class="footer-section">
+                    <h3 data-i18n="contactUs">اتصل بنا</h3>
+                    <p><span data-i18n="phone">الهاتف:</span> <a href="tel:+966114872290">+966 11 487 2290</a></p>
+                    <p><span data-i18n="email">البريد الإلكتروني:</span> <a href="mailto:export@alsahrapml.com">export@alsahrapml.com</a></p>
+                </div>
+                <div class="footer-section">
+                    <h3 data-i18n="quickLinks">روابط سريعة</h3>
+                    <ul>
+                        <li><a href="index.html" data-i18n="navHome">الرئيسية</a></li>
+                        <li><a href="tracking.html" data-i18n="navTracking">تتبع الشحنة</a></li>
+                        <li><a href="admin.html" data-i18n="navAdmin">لوحة التحكم</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 AL SAHRA PRECIOUS METALS & LOGISTICS LLC. <span data-i18n="copyright">جميع الحقوق محفوظة.</span></p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/firebase-config.js"></script>
+    <script src="js/database.js"></script>
+    <script src="js/translations.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
+

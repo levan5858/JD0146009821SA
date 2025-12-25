@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="trackingTitle">تتبع الشحنة - AL SAHRA PRECIOUS METALS</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/svg+xml" href="logo.svg">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <img src="logo.svg" alt="AL SAHRA Logo" class="logo-img">
+                <div class="logo-text">
+                    <h1>AL SAHRA PRECIOUS METALS & LOGISTICS</h1>
+                    <p class="tagline" data-i18n="tagline">خدمات الشحن والتوصيل الموثوقة</p>
+                </div>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html" data-i18n="navHome">الرئيسية</a></li>
+                    <li><a href="tracking.html" class="active" data-i18n="navTracking">تتبع الشحنة</a></li>
+                    <li><a href="admin.html" data-i18n="navAdmin">لوحة التحكم</a></li>
+                </ul>
+                <div class="language-switcher">
+                    <button class="lang-btn" onclick="setLanguage('ar')" id="lang-ar">العربية</button>
+                    <button class="lang-btn" onclick="setLanguage('en')" id="lang-en">English</button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="tracking-section">
+            <div class="container">
+                <h2 data-i18n="trackingTitle">تتبع شحنتك</h2>
+                <form class="track-form" id="trackForm">
+                    <input type="text" id="trackingNumber" data-i18n="trackPlaceholder" placeholder="أدخل رقم التتبع" required>
+                    <button type="submit" data-i18n="trackButton">تتبع</button>
+                </form>
+
+                <div id="trackingResult" class="tracking-result" style="display: none;">
+                    <div class="tracking-header">
+                        <h3><span data-i18n="trackingNumber">رقم التتبع</span>: <span id="resultTrackingNumber"></span></h3>
+                        <p class="status" id="statusText"></p>
+                    </div>
+
+                    <div class="timeline" id="timeline">
+                        <!-- Timeline items will be inserted here -->
+                    </div>
+
+                    <div class="shipment-details" id="shipmentDetails">
+                        <!-- Shipment details will be inserted here -->
+                    </div>
+                </div>
+
+                <div id="errorMessage" class="error-message" style="display: none;">
+                    <p data-i18n="errorNotFound">لم يتم العثور على شحنة بهذا الرقم. يرجى التحقق من رقم التتبع والمحاولة مرة أخرى.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3 data-i18n="companyInfo">معلومات الشركة</h3>
+                    <p><strong>AL SAHRA PRECIOUS METALS & LOGISTICS LLC</strong></p>
+                    <p data-i18n="addressArabic">طريق الملك فهد، حي العليا</p>
+                    <p>King Fahd Road, Al Olaya District</p>
+                    <p><span data-i18n="crNumber">الرقم الموحد:</span> 1010894457</p>
+                </div>
+                <div class="footer-section">
+                    <h3 data-i18n="contactUs">اتصل بنا</h3>
+                    <p><span data-i18n="phone">الهاتف:</span> <a href="tel:+966114872290">+966 11 487 2290</a></p>
+                    <p><span data-i18n="email">البريد الإلكتروني:</span> <a href="mailto:export@alsahrapml.com">export@alsahrapml.com</a></p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 AL SAHRA PRECIOUS METALS & LOGISTICS LLC. <span data-i18n="copyright">جميع الحقوق محفوظة.</span></p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/firebase-config.js"></script>
+    <script src="js/database.js"></script>
+    <script src="js/translations.js"></script>
+    <script src="js/tracking.js"></script>
+</body>
+</html>
+

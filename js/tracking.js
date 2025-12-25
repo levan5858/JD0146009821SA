@@ -12,8 +12,9 @@ document.addEventListener('DOMContentLoaded', function() {
     if (trackForm) {
         trackForm.addEventListener('submit', async function(e) {
             e.preventDefault();
-            const number = document.getElementById('trackingNumber').value.trim();
+            const number = document.getElementById('trackingNumber').value.trim().toUpperCase();
             if (number) {
+                document.getElementById('trackingNumber').value = number; // Update input to uppercase
                 await trackShipment(number);
             }
         });
@@ -23,6 +24,15 @@ document.addEventListener('DOMContentLoaded', function() {
 async function trackShipment(trackingNumber) {
     const resultDiv = document.getElementById('trackingResult');
     const errorDiv = document.getElementById('errorMessage');
+    
+    // Clean and normalize tracking number
+    const cleanTrackingNumber = trackingNumber.trim().toUpperCase();
+    
+    if (!cleanTrackingNumber) {
+        errorDiv.style.display = 'block';
+        errorDiv.textContent = 'Please enter a tracking number';
+        return;
+    }
     
     // Show loading state with animation
     resultDiv.style.display = 'none';
@@ -34,7 +44,7 @@ async function trackShipment(trackingNumber) {
     try {
         // Get shipment from database with timeout
         const shipment = await Promise.race([
-            database.getShipment(trackingNumber),
+            database.getShipment(cleanTrackingNumber),
             new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 10000))
         ]);
         
@@ -45,12 +55,27 @@ async function trackShipment(trackingNumber) {
             resultDiv.style.display = 'block';
             displayTrackingInfo(shipment);
         } else {
-            resultDiv.style.display = 'none';
-            errorDiv.style.display = 'block';
+            // Try case-insensitive search as fallback
+            console.log('Shipment not found with exact match, trying case-insensitive search...');
+            const allShipments = await database.getAllShipments();
+            const foundShipment = Object.values(allShipments).find(
+                s => s.trackingNumber && s.trackingNumber.toUpperCase() === cleanTrackingNumber
+            );
+            
+            if (foundShipment) {
+                errorDiv.style.display = 'none';
+                resultDiv.style.display = 'block';
+                displayTrackingInfo(foundShipment);
+            } else {
+                resultDiv.style.display = 'none';
+                errorDiv.style.display = 'block';
+                console.log('Available tracking numbers:', Object.keys(allShipments));
+            }
         }
     } catch (error) {
         hideLoadingSpinner();
         console.error('Error tracking shipment:', error);
+        console.error('Tracking number searched:', cleanTrackingNumber);
         resultDiv.style.display = 'none';
         errorDiv.style.display = 'block';
     }

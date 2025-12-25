@@ -7,21 +7,48 @@ const useFirebase = typeof firebase !== 'undefined' && window.db;
 const database = {
     // Get a shipment by tracking number
     async getShipment(trackingNumber) {
+        if (!trackingNumber) return null;
+        
+        // Normalize tracking number
+        const normalizedTracking = trackingNumber.trim().toUpperCase();
+        
         if (useFirebase) {
             try {
-                const doc = await window.db.collection('shipments').doc(trackingNumber).get();
+                // Try exact match first
+                let doc = await window.db.collection('shipments').doc(normalizedTracking).get();
                 if (doc.exists) {
                     return doc.data();
                 }
+                
+                // If not found, try case-insensitive search
+                const snapshot = await window.db.collection('shipments').get();
+                for (const docSnap of snapshot.docs) {
+                    const data = docSnap.data();
+                    if (data.trackingNumber && data.trackingNumber.toUpperCase() === normalizedTracking) {
+                        return data;
+                    }
+                }
+                
                 return null;
             } catch (error) {
                 console.error('Error getting shipment:', error);
+                console.error('Tracking number searched:', normalizedTracking);
                 return null;
             }
         } else {
             // Fallback to localStorage
             const shipments = JSON.parse(localStorage.getItem('shipments') || '{}');
-            return shipments[trackingNumber] || null;
+            // Try exact match
+            if (shipments[normalizedTracking]) {
+                return shipments[normalizedTracking];
+            }
+            // Try case-insensitive search
+            for (const key in shipments) {
+                if (key.toUpperCase() === normalizedTracking) {
+                    return shipments[key];
+                }
+            }
+            return null;
         }
     },
 

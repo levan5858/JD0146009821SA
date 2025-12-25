@@ -110,25 +110,41 @@ function displayTrackingInfo(shipment) {
         currentStep = index;
     });
     
-    // Add animated ship icon
+    // Add animated green ship icon that moves along timeline
     if (sortedHistory.length > 0 && timeline.children.length > 0) {
-        const lastItem = timeline.children[timeline.children.length - 1];
         const shipIcon = document.createElement('div');
-        shipIcon.className = 'ship-animation animate';
-        shipIcon.innerHTML = '🚢';
+        shipIcon.className = 'ship-animation';
         
-        // Position ship at the last status item
-        const timelineRect = timeline.getBoundingClientRect();
-        const itemRect = lastItem.getBoundingClientRect();
-        
-        if (document.body.classList.contains('rtl')) {
-            shipIcon.style.right = '30px';
-        } else {
-            shipIcon.style.left = '30px';
-        }
-        shipIcon.style.top = (itemRect.top - timelineRect.top + 10) + 'px';
+        // Create green ship SVG
+        shipIcon.innerHTML = `
+            <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20 5 L8 15 L8 25 L12 28 L12 32 L28 32 L28 28 L32 25 L32 15 Z" fill="#4a7c2a" stroke="#2d5016" stroke-width="1.5"/>
+                <rect x="14" y="18" width="12" height="8" fill="#6b9f3d"/>
+                <circle cx="16" cy="22" r="1.5" fill="#2d5016"/>
+                <circle cx="24" cy="22" r="1.5" fill="#2d5016"/>
+                <path d="M20 5 L20 15" stroke="#2d5016" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+        `;
         
         timeline.appendChild(shipIcon);
+        
+        // Position ship at the last status item with smooth animation
+        setTimeout(() => {
+            const lastItem = timeline.children[timeline.children.length - 2]; // -2 because ship is now last child
+            if (lastItem) {
+                const timelineRect = timeline.getBoundingClientRect();
+                const itemRect = lastItem.getBoundingClientRect();
+                const itemTop = itemRect.top - timelineRect.top + (itemRect.height / 2) - 20;
+                
+                if (document.body.classList.contains('rtl')) {
+                    shipIcon.style.right = '22px';
+                } else {
+                    shipIcon.style.left = '22px';
+                }
+                shipIcon.style.top = itemTop + 'px';
+                shipIcon.classList.add('animate');
+            }
+        }, 500);
     }
     
     // Display shipment details

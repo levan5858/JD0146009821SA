@@ -295,14 +295,27 @@ body.ltr .language-switcher {
     min-height: 200px;
 }
 
-/* Ship Animation */
+/* Ship Animation - USPS/DHL Style */
 .ship-animation {
     position: absolute;
-    font-size: 2.5rem;
     z-index: 10;
-    filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.25));
     pointer-events: none;
-    transition: top 1s ease-in-out;
+    transition: top 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 0;
+    transform-origin: center;
+}
+
+.ship-animation.animate {
+    opacity: 1;
+    animation: shipFloatSmooth 3s ease-in-out infinite;
+}
+
+.ship-animation svg {
+    display: block;
+    width: 40px;
+    height: 40px;
+    filter: drop-shadow(0 2px 4px rgba(74, 124, 42, 0.3));
 }
 
 body.rtl .ship-animation {
@@ -313,22 +326,25 @@ body.ltr .ship-animation {
     left: 22px;
 }
 
-.ship-animation.animate {
-    animation: shipFloat 2s ease-in-out infinite;
-}
-
-@keyframes shipFloat {
-    0%, 100% {
-        transform: translateY(0) rotate(-5deg);
+/* Smooth up and down movement like USPS/DHL - more pronounced */
+@keyframes shipFloatSmooth {
+    0% {
+        transform: translateY(0px) rotate(-3deg);
     }
-    25% {
-        transform: translateY(-8px) rotate(-3deg);
+    20% {
+        transform: translateY(-8px) rotate(-2deg);
     }
-    50% {
+    40% {
         transform: translateY(-12px) rotate(0deg);
     }
-    75% {
-        transform: translateY(-8px) rotate(3deg);
+    60% {
+        transform: translateY(-15px) rotate(2deg);
+    }
+    80% {
+        transform: translateY(-10px) rotate(1deg);
+    }
+    100% {
+        transform: translateY(0px) rotate(-3deg);
     }
 }
 
@@ -742,6 +758,81 @@ body.ltr .timeline-content {
     background-color: var(--light-green);
     transform: translateY(-2px);
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.btn-view-history {
+    background-color: var(--secondary-green);
+    color: var(--white);
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.3s, transform 0.2s;
+    font-size: 0.9rem;
+}
+
+.btn-view-history:hover {
+    background-color: var(--primary-green);
+    transform: translateY(-2px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* Status History Modal */
+.status-history-list {
+    max-height: 500px;
+    overflow-y: auto;
+    margin-top: 1rem;
+}
+
+.status-history-item {
+    background-color: var(--light-bg);
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    border-right: 4px solid var(--light-green);
+    transition: transform 0.2s;
+}
+
+.status-history-item:hover {
+    transform: translateX(-5px);
+}
+
+body.ltr .status-history-item {
+    border-right: none;
+    border-left: 4px solid var(--light-green);
+}
+
+body.ltr .status-history-item:hover {
+    transform: translateX(5px);
+}
+
+.status-history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.status-history-header h4 {
+    color: var(--primary-green);
+    margin: 0;
+}
+
+.btn-delete-status {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-delete-status:hover {
+    background-color: rgba(198, 40, 40, 0.1);
 }
 
 /* Modal */

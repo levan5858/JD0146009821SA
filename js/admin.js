@@ -72,11 +72,15 @@ function initializeAdmin() {
     window.addEventListener('click', function(e) {
         const statusModal = document.getElementById('editShipmentModal');
         const descModal = document.getElementById('editDescriptionModal');
+        const historyModal = document.getElementById('viewStatusHistoryModal');
         if (e.target === statusModal) {
             statusModal.style.display = 'none';
         }
         if (e.target === descModal) {
             descModal.style.display = 'none';
+        }
+        if (e.target === historyModal) {
+            historyModal.style.display = 'none';
         }
     });
     
@@ -232,6 +236,7 @@ function displayShipment(shipment) {
             <div class="shipment-actions">
                 <button class="btn-edit" onclick="openEditModal('${shipment.trackingNumber}')">${translations[lang].editStatus}</button>
                 <button class="btn-edit-description" onclick="openEditDescriptionModal('${shipment.trackingNumber}')">${translations[lang].editDescription || 'Edit Description'}</button>
+                <button class="btn-view-history" onclick="openStatusHistoryModal('${shipment.trackingNumber}')">${translations[lang].viewHistory || 'View History'}</button>
             </div>
         </div>
         <p><strong>${translations[lang].currentStatus}</strong> ${statusText}</p>
@@ -243,6 +248,134 @@ function displayShipment(shipment) {
     `;
     
     listDiv.appendChild(item);
+}
+
+async function openStatusHistoryModal(trackingNumber) {
+    const shipment = await database.getShipment(trackingNumber);
+    
+    if (!shipment) {
+        alert('Shipment not found');
+        return;
+    }
+    
+    const lang = currentLang || 'ar';
+    const statusMap = {
+        'pending': translations[lang].statusPending,
+        'picked_up': translations[lang].statusPickedUp,
+        'in_transit': translations[lang].statusInTransit,
+        'out_for_delivery': translations[lang].statusOutForDelivery,
+        'delivered': translations[lang].statusDelivered,
+        'exception': translations[lang].statusException
+    };
+    
+    // Sort by date (oldest first)
+    const sortedHistory = [...shipment.statusHistory].sort((a, b) => {
+        return new Date(a.dateTime) - new Date(b.dateTime);
+    });
+    
+    const historyList = document.getElementById('statusHistoryList');
+    historyList.innerHTML = '';
+    
+    if (sortedHistory.length === 0) {
+        historyList.innerHTML = '<p style="text-align: center; padding: 2rem;">No status history</p>';
+    } else {
+        sortedHistory.forEach((statusItem, index) => {
+            const date = new Date(statusItem.dateTime);
+            const locale = lang === 'ar' ? 'ar-SA' : 'en-US';
+            const formattedDate = date.toLocaleDateString(locale, {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            const historyItem = document.createElement('div');
+            historyItem.className = 'status-history-item';
+            historyItem.innerHTML = `
+                <div class="status-history-content">
+                    <div class="status-history-header">
+                        <h4>${statusMap[statusItem.status] || statusItem.status}</h4>
+                        <button class="btn-delete-status" onclick="deleteStatus('${trackingNumber}', ${index})" title="${translations[lang].deleteStatus || 'Delete'}">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M5 5 L15 15 M15 5 L5 15" stroke="#c62828" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <p><strong>${translations[lang].location}:</strong> ${statusItem.location}</p>
+                    <p><strong>${translations[lang].date}:</strong> ${formattedDate}</p>
+                    ${statusItem.notes ? `<p><strong>${translations[lang].notes}:</strong> ${statusItem.notes}</p>` : ''}
+                </div>
+            `;
+            historyList.appendChild(historyItem);
+        });
+    }
+    
+    document.getElementById('viewStatusHistoryModal').setAttribute('data-tracking', trackingNumber);
+    document.getElementById('viewStatusHistoryModal').style.display = 'block';
+}
+
+async function deleteStatus(trackingNumber, displayIndex) {
+    const lang = currentLang || 'ar';
+    
+    if (!confirm(translations[lang].confirmDelete || 'Are you sure you want to delete this status?')) {
+        return;
+    }
+    
+    const shipment = await database.getShipment(trackingNumber);
+    
+    if (!shipment || !shipment.statusHistory || shipment.statusHistory.length === 0) {
+        return;
+    }
+    
+    // Sort by date to match the display order
+    const sortedHistory = [...shipment.statusHistory].sort((a, b) => {
+        return new Date(a.dateTime) - new Date(b.dateTime);
+    });
+    
+    // Get the status to delete
+    const statusToDelete = sortedHistory[displayIndex];
+    
+    if (!statusToDelete) {
+        return;
+    }
+    
+    // Find and remove from original array by matching dateTime and status
+    shipment.statusHistory = shipment.statusHistory.filter(status => {
+        return !(status.dateTime === statusToDelete.dateTime && 
+                 status.status === statusToDelete.status &&
+                 status.location === statusToDelete.location);
+    });
+    
+    // Ensure at least one status remains
+    if (shipment.statusHistory.length === 0) {
+        alert('Cannot delete the last status. Please add a new status first.');
+        return;
+    }
+    
+    try {
+        const updated = await database.updateShipment(trackingNumber, shipment);
+        
+        if (updated) {
+            alert(translations[lang].statusDeleted || 'Status deleted successfully!');
+            // Refresh the modal
+            await openStatusHistoryModal(trackingNumber);
+            // Refresh the shipment list
+            const searchInput = document.getElementById('searchTracking');
+            if (searchInput && searchInput.value.trim()) {
+                await searchShipment();
+            } else {
+                await loadAllShipments();
+            }
+        }
+    } catch (error) {
+        console.error('Error deleting status:', error);
+        alert('Error deleting status: ' + error.message);
+    }
+}
+
+function closeStatusHistoryModal() {
+    document.getElementById('viewStatusHistoryModal').style.display = 'none';
 }
 
 async function openEditModal(trackingNumber) {
@@ -410,6 +543,9 @@ function closeEditDescriptionModal() {
 // Make functions available globally
 window.openEditModal = openEditModal;
 window.openEditDescriptionModal = openEditDescriptionModal;
+window.openStatusHistoryModal = openStatusHistoryModal;
 window.closeEditModal = closeEditModal;
 window.closeEditDescriptionModal = closeEditDescriptionModal;
+window.closeStatusHistoryModal = closeStatusHistoryModal;
+window.deleteStatus = deleteStatus;
 

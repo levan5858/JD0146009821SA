@@ -93,6 +93,11 @@ const translations = {
         editDescriptionTitle: "تعديل وصف الشحنة",
         saveDescription: "حفظ الوصف",
         statusNote: "يمكنك اختيار أي حالة، حتى العودة إلى حالة سابقة",
+        viewHistory: "عرض السجل",
+        statusHistoryTitle: "سجل الحالات",
+        deleteStatus: "حذف",
+        confirmDelete: "هل أنت متأكد من حذف هذه الحالة؟",
+        statusDeleted: "تم حذف الحالة بنجاح",
         
         // Footer
         companyInfo: "معلومات الشركة",
@@ -207,6 +212,11 @@ const translations = {
         editDescriptionTitle: "Edit Shipment Description",
         saveDescription: "Save Description",
         statusNote: "You can select any status, including reverting to a previous status",
+        viewHistory: "View History",
+        statusHistoryTitle: "Status History",
+        deleteStatus: "Delete",
+        confirmDelete: "Are you sure you want to delete this status?",
+        statusDeleted: "Status deleted successfully",
         
         // Footer
         companyInfo: "Company Information",

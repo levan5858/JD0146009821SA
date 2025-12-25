@@ -72,9 +72,9 @@ function initializeAdmin() {
     // Update status form
     const updateForm = document.getElementById('updateStatusForm');
     if (updateForm) {
-        updateForm.addEventListener('submit', function(e) {
+        updateForm.addEventListener('submit', async function(e) {
             e.preventDefault();
-            updateShipmentStatus();
+            await updateShipmentStatus();
         });
     }
     
@@ -245,11 +245,22 @@ async function updateShipmentStatus() {
     const modal = document.getElementById('editShipmentModal');
     const trackingNumber = modal.getAttribute('data-tracking');
     
-    if (!trackingNumber) return;
+    if (!trackingNumber) {
+        console.error('No tracking number found');
+        return;
+    }
     
     const shipment = await database.getShipment(trackingNumber);
     
-    if (!shipment) return;
+    if (!shipment) {
+        alert('Shipment not found');
+        return;
+    }
+    
+    // Ensure statusHistory exists
+    if (!shipment.statusHistory) {
+        shipment.statusHistory = [];
+    }
     
     const newStatus = document.getElementById('newStatus').value;
     const location = document.getElementById('statusLocation').value.trim();
@@ -270,28 +281,35 @@ async function updateShipmentStatus() {
     });
     
     // Update in database
-    const updated = await database.updateShipment(trackingNumber, shipment);
-    
-    if (updated) {
-        alert(translations[lang].alertUpdated);
-        modal.style.display = 'none';
-        document.getElementById('updateStatusForm').reset();
+    try {
+        const updated = await database.updateShipment(trackingNumber, shipment);
         
-        // Set default datetime to now for next use
-        const dateTimeInput = document.getElementById('statusDateTime');
-        if (dateTimeInput) {
-            const now = new Date();
-            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-            dateTimeInput.value = now.toISOString().slice(0, 16);
-        }
-        
-        // Refresh the list
-        const searchInput = document.getElementById('searchTracking');
-        if (searchInput.value.trim()) {
-            searchShipment();
+        if (updated) {
+            alert(translations[lang].alertUpdated);
+            modal.style.display = 'none';
+            document.getElementById('updateStatusForm').reset();
+            
+            // Set default datetime to now for next use
+            const dateTimeInput = document.getElementById('statusDateTime');
+            if (dateTimeInput) {
+                const now = new Date();
+                now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+                dateTimeInput.value = now.toISOString().slice(0, 16);
+            }
+            
+            // Refresh the list
+            const searchInput = document.getElementById('searchTracking');
+            if (searchInput && searchInput.value.trim()) {
+                await searchShipment();
+            } else {
+                await loadAllShipments();
+            }
         } else {
-            loadAllShipments();
+            alert('Failed to update shipment. Please check console for errors.');
         }
+    } catch (error) {
+        console.error('Error updating shipment status:', error);
+        alert('Error updating shipment: ' + error.message);
     }
 }
 

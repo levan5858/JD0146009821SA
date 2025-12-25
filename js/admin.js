@@ -26,6 +26,12 @@ function initializeAdmin() {
             
             this.classList.add('active');
             document.getElementById(targetTab + 'Tab').classList.add('active');
+            
+            // Clear tags when switching to create tab
+            if (targetTab === 'create') {
+                currentTags = [];
+                updateTagsPreview('tagsPreview', []);
+            }
         });
     });
     
@@ -59,11 +65,15 @@ function initializeAdmin() {
         btn.addEventListener('click', function() {
             const statusModal = document.getElementById('editShipmentModal');
             const descModal = document.getElementById('editDescriptionModal');
+            const tagsModal = document.getElementById('editTagsModal');
             if (statusModal && statusModal.style.display !== 'none') {
                 statusModal.style.display = 'none';
             }
             if (descModal && descModal.style.display !== 'none') {
                 descModal.style.display = 'none';
+            }
+            if (tagsModal && tagsModal.style.display !== 'none') {
+                tagsModal.style.display = 'none';
             }
         });
     });
@@ -73,6 +83,7 @@ function initializeAdmin() {
         const statusModal = document.getElementById('editShipmentModal');
         const descModal = document.getElementById('editDescriptionModal');
         const historyModal = document.getElementById('viewStatusHistoryModal');
+        const tagsModal = document.getElementById('editTagsModal');
         if (e.target === statusModal) {
             statusModal.style.display = 'none';
         }
@@ -81,6 +92,13 @@ function initializeAdmin() {
         }
         if (e.target === historyModal) {
             historyModal.style.display = 'none';
+        }
+        if (tagsModal && e.target === tagsModal) {
+            tagsModal.style.display = 'none';
+        }
+        const tagsModal = document.getElementById('editTagsModal');
+        if (tagsModal && e.target === tagsModal) {
+            tagsModal.style.display = 'none';
         }
     });
     
@@ -110,8 +128,95 @@ function initializeAdmin() {
         dateTimeInput.value = now.toISOString().slice(0, 16);
     }
     
+    // Tags input handling
+    const tagInput = document.getElementById('tagInput');
+    if (tagInput) {
+        tagInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addTag();
+            }
+        });
+    }
+    
+    const editTagInput = document.getElementById('editTagInput');
+    if (editTagInput) {
+        editTagInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addEditTag();
+            }
+        });
+    }
+    
     // Load all shipments on manage tab
     loadAllShipments();
+}
+
+// Tags management
+let currentTags = [];
+let editTagsTrackingNumber = null;
+
+function addTag() {
+    const tagInput = document.getElementById('tagInput');
+    const tag = tagInput.value.trim();
+    
+    if (tag && !currentTags.includes(tag)) {
+        currentTags.push(tag);
+        updateTagsPreview('tagsPreview', currentTags);
+        tagInput.value = '';
+    }
+}
+
+function addEditTag() {
+    const tagInput = document.getElementById('editTagInput');
+    const tag = tagInput.value.trim();
+    
+    if (tag && !currentTags.includes(tag)) {
+        currentTags.push(tag);
+        updateTagsPreview('editTagsPreview', currentTags);
+        tagInput.value = '';
+    }
+}
+
+function removeTag(tag, previewId) {
+    currentTags = currentTags.filter(t => t !== tag);
+    updateTagsPreview(previewId, currentTags);
+}
+
+function addSuggestedTag(tag) {
+    if (!currentTags.includes(tag)) {
+        currentTags.push(tag);
+        updateTagsPreview('tagsPreview', currentTags);
+    }
+}
+
+function addEditSuggestedTag(tag) {
+    if (!currentTags.includes(tag)) {
+        currentTags.push(tag);
+        updateTagsPreview('editTagsPreview', currentTags);
+    }
+}
+
+function updateTagsPreview(previewId, tags) {
+    const preview = document.getElementById(previewId);
+    preview.innerHTML = '';
+    
+    tags.forEach(tag => {
+        const tagElement = document.createElement('span');
+        tagElement.className = 'tag-badge';
+        tagElement.innerHTML = `
+            ${tag}
+            <span class="tag-remove" onclick="removeTag('${tag}', '${previewId}')">&times;</span>
+        `;
+        preview.appendChild(tagElement);
+    });
+}
+
+function renderTags(tags) {
+    if (!tags || tags.length === 0) return '';
+    
+    return tags.map(tag => `<span class="tag-badge-display">${tag}</span>`).join('');
 }
 
 async function createShipment() {
@@ -148,6 +253,7 @@ async function createShipment() {
         senderAddress: senderAddress,
         weight: weight,
         description: description,
+        tags: currentTags.length > 0 ? [...currentTags] : [],
         statusHistory: [{
             status: 'pending',
             location: initialLocation,
@@ -163,6 +269,8 @@ async function createShipment() {
     if (saved) {
         alert(translations[lang].alertCreated);
         document.getElementById('createShipmentForm').reset();
+        currentTags = [];
+        updateTagsPreview('tagsPreview', []);
         
         // Switch to manage tab and show the new shipment
         document.querySelector('[data-tab="manage"]').click();
@@ -236,6 +344,7 @@ function displayShipment(shipment) {
             <div class="shipment-actions">
                 <button class="btn-edit" onclick="openEditModal('${shipment.trackingNumber}')">${translations[lang].editStatus}</button>
                 <button class="btn-edit-description" onclick="openEditDescriptionModal('${shipment.trackingNumber}')">${translations[lang].editDescription || 'Edit Description'}</button>
+                <button class="btn-edit-tags" onclick="openEditTagsModal('${shipment.trackingNumber}')">${translations[lang].editTags || 'Edit Tags'}</button>
                 <button class="btn-view-history" onclick="openStatusHistoryModal('${shipment.trackingNumber}')">${translations[lang].viewHistory || 'View History'}</button>
             </div>
         </div>
@@ -244,10 +353,66 @@ function displayShipment(shipment) {
         <p><strong>${translations[lang].recipient}:</strong> ${shipment.recipientName}</p>
         <p><strong>${translations[lang].weight}:</strong> ${shipment.weight} ${weightUnit}</p>
         ${shipment.description ? `<p><strong>${translations[lang].description}:</strong> ${shipment.description}</p>` : ''}
+        ${shipment.tags && shipment.tags.length > 0 ? `
+        <div class="shipment-tags">
+            <strong>${translations[lang].tags || 'Tags'}:</strong>
+            ${renderTags(shipment.tags)}
+        </div>
+        ` : ''}
         <p><strong>${translations[lang].updateCount}</strong> ${shipment.statusHistory.length}</p>
     `;
     
     listDiv.appendChild(item);
+}
+
+async function openEditTagsModal(trackingNumber) {
+    const shipment = await database.getShipment(trackingNumber);
+    
+    if (!shipment) {
+        alert('Shipment not found');
+        return;
+    }
+    
+    editTagsTrackingNumber = trackingNumber;
+    currentTags = shipment.tags ? [...shipment.tags] : [];
+    updateTagsPreview('editTagsPreview', currentTags);
+    
+    document.getElementById('editTagsModal').style.display = 'block';
+}
+
+async function saveTags() {
+    if (!editTagsTrackingNumber) return;
+    
+    const shipment = await database.getShipment(editTagsTrackingNumber);
+    if (!shipment) return;
+    
+    shipment.tags = [...currentTags];
+    
+    try {
+        const updated = await database.updateShipment(editTagsTrackingNumber, shipment);
+        
+        if (updated) {
+            const lang = currentLang || 'ar';
+            alert(translations[lang].tagsSaved || 'Tags saved successfully!');
+            document.getElementById('editTagsModal').style.display = 'none';
+            
+            // Refresh the list
+            const searchInput = document.getElementById('searchTracking');
+            if (searchInput && searchInput.value.trim()) {
+                await searchShipment();
+            } else {
+                await loadAllShipments();
+            }
+        }
+    } catch (error) {
+        console.error('Error saving tags:', error);
+        alert('Error saving tags: ' + error.message);
+    }
+}
+
+function closeEditTagsModal() {
+    document.getElementById('editTagsModal').style.display = 'none';
+    editTagsTrackingNumber = null;
 }
 
 async function openStatusHistoryModal(trackingNumber) {
@@ -543,9 +708,18 @@ function closeEditDescriptionModal() {
 // Make functions available globally
 window.openEditModal = openEditModal;
 window.openEditDescriptionModal = openEditDescriptionModal;
+window.openEditTagsModal = openEditTagsModal;
 window.openStatusHistoryModal = openStatusHistoryModal;
 window.closeEditModal = closeEditModal;
 window.closeEditDescriptionModal = closeEditDescriptionModal;
+window.closeEditTagsModal = closeEditTagsModal;
 window.closeStatusHistoryModal = closeStatusHistoryModal;
 window.deleteStatus = deleteStatus;
+window.addTag = addTag;
+window.addEditTag = addEditTag;
+window.removeTag = removeTag;
+window.addSuggestedTag = addSuggestedTag;
+window.addEditSuggestedTag = addEditSuggestedTag;
+window.saveTags = saveTags;
+window.renderTags = renderTags;
 

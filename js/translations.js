@@ -98,6 +98,15 @@ const translations = {
         deleteStatus: "حذف",
         confirmDelete: "هل أنت متأكد من حذف هذه الحالة؟",
         statusDeleted: "تم حذف الحالة بنجاح",
+        editTags: "تعديل العلامات",
+        editTagsTitle: "تعديل العلامات",
+        labelTags: "العلامات:",
+        tagInputPlaceholder: "أدخل علامة واضغط Enter",
+        addTag: "إضافة",
+        tags: "العلامات",
+        tagSuggestions: "اقتراحات:",
+        saveTags: "حفظ العلامات",
+        tagsSaved: "تم حفظ العلامات بنجاح",
         
         // Footer
         companyInfo: "معلومات الشركة",
@@ -217,6 +226,15 @@ const translations = {
         deleteStatus: "Delete",
         confirmDelete: "Are you sure you want to delete this status?",
         statusDeleted: "Status deleted successfully",
+        editTags: "Edit Tags",
+        editTagsTitle: "Edit Tags",
+        labelTags: "Tags:",
+        tagInputPlaceholder: "Enter tag and press Enter",
+        addTag: "Add",
+        tags: "Tags",
+        tagSuggestions: "Suggestions:",
+        saveTags: "Save Tags",
+        tagsSaved: "Tags saved successfully",
         
         // Footer
         companyInfo: "Company Information",

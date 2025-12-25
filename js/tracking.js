@@ -173,6 +173,14 @@ function displayTrackingInfo(shipment) {
                 ${shipment.description}
             </div>
             ` : ''}
+            ${shipment.tags && shipment.tags.length > 0 ? `
+            <div class="detail-item detail-item-full">
+                <strong>${translations[lang].tags || 'Tags'}:</strong>
+                <div class="tags-display">
+                    ${shipment.tags.map(tag => `<span class="tag-badge-display">${tag}</span>`).join('')}
+                </div>
+            </div>
+            ` : ''}
         </div>
     `;
 }

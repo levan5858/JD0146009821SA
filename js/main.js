@@ -4,10 +4,11 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (trackForm) {
         trackForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const trackingNumber = document.getElementById('trackingNumber').value.trim();
+            const trackingNumber = document.getElementById('trackingNumber').value.trim().toUpperCase();
             if (trackingNumber) {
-                window.location.href = `/tracking?track=${encodeURIComponent(trackingNumber)}`;
+                // Update the input value to uppercase before form submission
+                document.getElementById('trackingNumber').value = trackingNumber;
+                // Let the form submit naturally to /tracking (form action is already set correctly)
             }
         });
     }

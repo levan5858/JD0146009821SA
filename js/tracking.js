@@ -24,22 +24,56 @@ async function trackShipment(trackingNumber) {
     const resultDiv = document.getElementById('trackingResult');
     const errorDiv = document.getElementById('errorMessage');
     
-    // Show loading state
+    // Show loading state with animation
     resultDiv.style.display = 'none';
     errorDiv.style.display = 'none';
     
-    // Get shipment from database
-    const shipment = await database.getShipment(trackingNumber);
+    // Show loading spinner
+    showLoadingSpinner('trackingResult');
     
-    if (shipment) {
-        errorDiv.style.display = 'none';
-        resultDiv.style.display = 'block';
+    try {
+        // Get shipment from database with timeout
+        const shipment = await Promise.race([
+            database.getShipment(trackingNumber),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 10000))
+        ]);
         
-        displayTrackingInfo(shipment);
-    } else {
+        hideLoadingSpinner();
+        
+        if (shipment) {
+            errorDiv.style.display = 'none';
+            resultDiv.style.display = 'block';
+            displayTrackingInfo(shipment);
+        } else {
+            resultDiv.style.display = 'none';
+            errorDiv.style.display = 'block';
+        }
+    } catch (error) {
+        hideLoadingSpinner();
+        console.error('Error tracking shipment:', error);
         resultDiv.style.display = 'none';
         errorDiv.style.display = 'block';
     }
+}
+
+function showLoadingSpinner(containerId) {
+    const container = document.getElementById(containerId);
+    if (container) {
+        container.innerHTML = `
+            <div class="loading-container">
+                <div class="spinner"></div>
+                <p>Loading shipment information...</p>
+            </div>
+        `;
+        container.style.display = 'block';
+    }
+}
+
+function hideLoadingSpinner() {
+    const loadingContainers = document.querySelectorAll('.loading-container');
+    loadingContainers.forEach(container => {
+        container.remove();
+    });
 }
 
 function displayTrackingInfo(shipment) {

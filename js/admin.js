@@ -230,47 +230,76 @@ async function createShipment() {
         return;
     }
     
-    // Check if tracking number exists
-    const exists = await database.trackingNumberExists(trackingNumber);
-    if (exists) {
-        alert(translations[lang].alertTrackingExists);
-        return;
+    // Show loading on submit button
+    const submitBtn = document.querySelector('#createShipmentForm button[type="submit"]');
+    const originalBtnText = submitBtn ? submitBtn.innerHTML : '';
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<div class="spinner-small"></div> Creating...';
     }
     
-    // Create new shipment
-    const initialLocation = lang === 'ar' ? 'مركز التوزيع الرئيسي' : 'Main Distribution Center';
-    const initialNotes = lang === 'ar' ? 'تم إنشاء الشحنة' : 'Shipment created';
-    
-    const shipment = {
-        trackingNumber: trackingNumber,
-        recipientName: recipientName,
-        recipientAddress: recipientAddress,
-        senderName: senderName,
-        senderAddress: senderAddress,
-        weight: weight,
-        description: description,
-        tags: currentTags.length > 0 ? [...currentTags] : [],
-        statusHistory: [{
-            status: 'pending',
-            location: initialLocation,
-            dateTime: new Date().toISOString(),
-            notes: initialNotes
-        }],
-        createdAt: new Date().toISOString()
-    };
-    
-    // Save to database
-    const saved = await database.saveShipment(shipment);
-    
-    if (saved) {
-        alert(translations[lang].alertCreated);
-        document.getElementById('createShipmentForm').reset();
-        currentTags = [];
-        updateTagsPreview('tagsPreview', []);
+    try {
+        // Check if tracking number exists
+        const exists = await Promise.race([
+            database.trackingNumberExists(trackingNumber),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000))
+        ]);
         
-        // Switch to manage tab and show the new shipment
-        document.querySelector('[data-tab="manage"]').click();
-        displayShipment(shipment);
+        if (exists) {
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnText;
+            }
+            alert(translations[lang].alertTrackingExists);
+            return;
+        }
+        
+        // Create new shipment
+        const initialLocation = lang === 'ar' ? 'مركز التوزيع الرئيسي' : 'Main Distribution Center';
+        const initialNotes = lang === 'ar' ? 'تم إنشاء الشحنة' : 'Shipment created';
+        
+        const shipment = {
+            trackingNumber: trackingNumber,
+            recipientName: recipientName,
+            recipientAddress: recipientAddress,
+            senderName: senderName,
+            senderAddress: senderAddress,
+            weight: weight,
+            description: description,
+            tags: currentTags.length > 0 ? [...currentTags] : [],
+            statusHistory: [{
+                status: 'pending',
+                location: initialLocation,
+                dateTime: new Date().toISOString(),
+                notes: initialNotes
+            }],
+            createdAt: new Date().toISOString()
+        };
+        
+        // Save to database
+        const saved = await Promise.race([
+            database.saveShipment(shipment),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 10000))
+        ]);
+        
+        if (saved) {
+            alert(translations[lang].alertCreated);
+            document.getElementById('createShipmentForm').reset();
+            currentTags = [];
+            updateTagsPreview('tagsPreview', []);
+            
+            // Switch to manage tab and show the new shipment
+            document.querySelector('[data-tab="manage"]').click();
+            displayShipment(shipment);
+        }
+    } catch (error) {
+        console.error('Error creating shipment:', error);
+        alert(translations[lang].alertErrorCreating || 'Error creating shipment. Please try again.');
+    } finally {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnText;
+        }
     }
 }
 
@@ -295,24 +324,42 @@ async function searchShipment() {
 
 async function loadAllShipments() {
     const lang = currentLang || 'ar';
-    const shipments = await database.getAllShipments();
     const listDiv = document.getElementById('shipmentList');
     
-    if (Object.keys(shipments).length === 0) {
-        listDiv.innerHTML = `<p style="text-align: center; padding: 2rem;">${translations[lang].noShipments}</p>`;
-        return;
+    // Show loading spinner
+    listDiv.innerHTML = `
+        <div class="loading-container">
+            <div class="spinner"></div>
+            <p>Loading shipments...</p>
+        </div>
+    `;
+    
+    try {
+        // Get shipments with timeout
+        const shipments = await Promise.race([
+            database.getAllShipments(),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 10000))
+        ]);
+        
+        if (Object.keys(shipments).length === 0) {
+            listDiv.innerHTML = `<p style="text-align: center; padding: 2rem;">${translations[lang].noShipments}</p>`;
+            return;
+        }
+        
+        listDiv.innerHTML = '';
+        
+        // Sort by creation date (newest first)
+        const sortedShipments = Object.values(shipments).sort((a, b) => {
+            return new Date(b.createdAt) - new Date(a.createdAt);
+        });
+        
+        sortedShipments.forEach(shipment => {
+            displayShipment(shipment);
+        });
+    } catch (error) {
+        console.error('Error loading shipments:', error);
+        listDiv.innerHTML = `<p style="text-align: center; padding: 2rem; color: var(--text-light);">Error loading shipments. Please refresh the page.</p>`;
     }
-    
-    listDiv.innerHTML = '';
-    
-    // Sort by creation date (newest first)
-    const sortedShipments = Object.values(shipments).sort((a, b) => {
-        return new Date(b.createdAt) - new Date(a.createdAt);
-    });
-    
-    sortedShipments.forEach(shipment => {
-        displayShipment(shipment);
-    });
 }
 
 function displayShipment(shipment) {

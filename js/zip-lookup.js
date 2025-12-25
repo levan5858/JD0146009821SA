@@ -38,34 +38,35 @@ async function searchZip(searchTerm) {
     resultsDiv.style.display = 'none';
     errorDiv.style.display = 'none';
     
-    // Show loading state
+    // Show loading state with animation
     if (resultsList) {
-        resultsList.innerHTML = '<div class="loading-spinner">Searching worldwide database...</div>';
+        resultsList.innerHTML = `
+            <div class="loading-spinner">
+                <div class="spinner"></div>
+                <p>Searching worldwide database...</p>
+            </div>
+        `;
         resultsDiv.style.display = 'block';
     }
     
     try {
         let results = [];
         
-        // Strategy 1: Try Zippopotam.us API (free, no auth needed) for postal codes
-        if (/^\d{3,10}$/.test(searchTerm.replace(/[-\s]/g, ''))) {
-            results = await searchZippopotam(searchTerm);
-        }
+        // Try all strategies in parallel for faster results
+        const [zippopotamResults, geoNamesPlaceResults, geoNamesPostalResults, localResults] = await Promise.allSettled([
+            /^\d{3,10}$/.test(searchTerm.replace(/[-\s]/g, '')) ? searchZippopotam(searchTerm) : Promise.resolve([]),
+            searchGeoNamesPlace(searchTerm),
+            searchGeoNamesPostal(searchTerm),
+            Promise.resolve(searchLocalDatabase(searchTerm))
+        ]);
         
-        // Strategy 2: Use GeoNames API for place names
-        if (results.length === 0) {
-            results = await searchGeoNamesPlace(searchTerm);
-        }
-        
-        // Strategy 3: Use GeoNames postal code search
-        if (results.length === 0) {
-            results = await searchGeoNamesPostal(searchTerm);
-        }
-        
-        // Strategy 4: Fallback to our local database
-        if (results.length === 0) {
-            results = searchLocalDatabase(searchTerm);
-        }
+        // Combine all results
+        results = [
+            ...(zippopotamResults.status === 'fulfilled' ? zippopotamResults.value : []),
+            ...(geoNamesPlaceResults.status === 'fulfilled' ? geoNamesPlaceResults.value : []),
+            ...(geoNamesPostalResults.status === 'fulfilled' ? geoNamesPostalResults.value : []),
+            ...(localResults.status === 'fulfilled' ? localResults.value : [])
+        ];
         
         if (results.length === 0) {
             errorDiv.innerHTML = `
@@ -235,13 +236,15 @@ async function searchGeoNamesPlace(placeName) {
     return [];
 }
 
-// GeoNames postal code search
+// GeoNames postal code search - Get ALL postal codes for a city
 async function searchGeoNamesPostal(searchTerm) {
+    const results = [];
+    
     // If it looks like a postal code, search directly
     const cleanCode = searchTerm.replace(/[-\s]/g, '');
     if (/^\d+$/.test(cleanCode)) {
         try {
-            const url = `https://secure.geonames.org/postalCodeSearchJSON?postalcode=${encodeURIComponent(cleanCode)}&maxRows=50&username=demo`;
+            const url = `https://secure.geonames.org/postalCodeSearchJSON?postalcode=${encodeURIComponent(cleanCode)}&maxRows=100&username=demo`;
             const response = await fetch(url);
             
             if (response.ok) {
@@ -261,6 +264,50 @@ async function searchGeoNamesPostal(searchTerm) {
         } catch (error) {
             console.error('GeoNames postal search error:', error);
         }
+    }
+    
+    // Search by city name to get ALL postal codes for that city
+    try {
+        // First, find the city
+        const citySearchUrl = `https://secure.geonames.org/searchJSON?q=${encodeURIComponent(searchTerm)}&maxRows=10&username=demo&featureClass=P&style=full`;
+        const cityResponse = await fetch(citySearchUrl);
+        
+        if (cityResponse.ok) {
+            const cityData = await cityResponse.json();
+            if (cityData.geonames && cityData.geonames.length > 0) {
+                // For each matching city, get all its postal codes
+                const cityPromises = cityData.geonames.slice(0, 5).map(async (city) => {
+                    try {
+                        // Get all postal codes for this city
+                        const postalUrl = `https://secure.geonames.org/postalCodeSearchJSON?placename=${encodeURIComponent(city.name)}&country=${city.countryCode}&maxRows=100&username=demo`;
+                        const postalResponse = await fetch(postalUrl);
+                        
+                        if (postalResponse.ok) {
+                            const postalData = await postalResponse.json();
+                            if (postalData.postalCodes && postalData.postalCodes.length > 0) {
+                                return postalData.postalCodes.map(item => ({
+                                    code: item.postalCode,
+                                    city: item.placeName,
+                                    state: item.adminName1 || '',
+                                    country: item.countryCode,
+                                    countryName: getCountryNameFromCode(item.countryCode),
+                                    lat: item.lat,
+                                    lng: item.lng
+                                }));
+                            }
+                        }
+                    } catch (error) {
+                        console.log('Error fetching postal codes for city:', error);
+                    }
+                    return [];
+                });
+                
+                const cityResults = await Promise.all(cityPromises);
+                return cityResults.flat();
+            }
+        }
+    } catch (error) {
+        console.error('GeoNames city postal search error:', error);
     }
     
     return [];

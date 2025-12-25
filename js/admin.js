@@ -96,10 +96,6 @@ function initializeAdmin() {
         if (tagsModal && e.target === tagsModal) {
             tagsModal.style.display = 'none';
         }
-        const tagsModal = document.getElementById('editTagsModal');
-        if (tagsModal && e.target === tagsModal) {
-            tagsModal.style.display = 'none';
-        }
     });
     
     // Update status form

@@ -641,6 +641,18 @@ body.ltr .timeline-content {
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.btn-edit:hover {
+    background-color: var(--secondary-green);
+    transform: translateY(-2px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.btn-edit:active {
+    transform: translateY(0);
 }
 
 /* Modal */

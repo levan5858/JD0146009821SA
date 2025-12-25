@@ -221,11 +221,15 @@ function displayShipment(shipment) {
     listDiv.appendChild(item);
 }
 
-function openEditModal(trackingNumber) {
-    const shipments = JSON.parse(localStorage.getItem('shipments') || '{}');
-    const shipment = shipments[trackingNumber];
+async function openEditModal(trackingNumber) {
+    // Get shipment from database
+    const shipment = await database.getShipment(trackingNumber);
     
-    if (!shipment) return;
+    if (!shipment) {
+        console.error('Shipment not found:', trackingNumber);
+        alert('Shipment not found');
+        return;
+    }
     
     // Store current tracking number for update
     document.getElementById('editShipmentModal').setAttribute('data-tracking', trackingNumber);

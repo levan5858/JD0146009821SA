@@ -128,6 +128,29 @@ const database = {
             const shipments = JSON.parse(localStorage.getItem('shipments') || '{}');
             return !!shipments[trackingNumber];
         }
+    },
+
+    // Delete a shipment
+    async deleteShipment(trackingNumber) {
+        if (!trackingNumber) return false;
+        
+        const normalizedTracking = trackingNumber.trim().toUpperCase();
+        
+        if (useFirebase) {
+            try {
+                await window.db.collection('shipments').doc(normalizedTracking).delete();
+                return true;
+            } catch (error) {
+                console.error('Error deleting shipment:', error);
+                return false;
+            }
+        } else {
+            // Fallback to localStorage
+            const shipments = JSON.parse(localStorage.getItem('shipments') || '{}');
+            delete shipments[normalizedTracking];
+            localStorage.setItem('shipments', JSON.stringify(shipments));
+            return true;
+        }
     }
 };
 

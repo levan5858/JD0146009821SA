@@ -994,6 +994,28 @@ body.ltr .timeline-content {
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
+.btn-delete {
+    background-color: #c62828;
+    color: var(--white);
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.3s, transform 0.2s;
+    font-size: 0.9rem;
+}
+
+.btn-delete:hover {
+    background-color: #b71c1c;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.btn-delete:active {
+    transform: translateY(0);
+}
+
 /* Status History Modal */
 .status-history-list {
     max-height: 500px;

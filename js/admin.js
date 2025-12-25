@@ -429,6 +429,7 @@ function displayShipment(shipment) {
                 <button class="btn-edit-description" onclick="openEditDescriptionModal('${shipment.trackingNumber}')">${translations[lang].editDescription || 'Edit Description'}</button>
                 <button class="btn-edit-tags" onclick="openEditTagsModal('${shipment.trackingNumber}')">${translations[lang].editTags || 'Edit Tags'}</button>
                 <button class="btn-view-history" onclick="openStatusHistoryModal('${shipment.trackingNumber}')">${translations[lang].viewHistory || 'View History'}</button>
+                <button class="btn-delete" onclick="deleteShipment('${shipment.trackingNumber}')">${translations[lang].deleteShipment || 'Delete'}</button>
             </div>
         </div>
         <p><strong>${translations[lang].currentStatus}</strong> ${statusText}</p>
@@ -795,6 +796,57 @@ function closeEditDescriptionModal() {
     document.getElementById('editDescriptionModal').style.display = 'none';
 }
 
+async function deleteShipment(trackingNumber) {
+    const lang = currentLang || 'ar';
+    
+    if (!trackingNumber) {
+        return;
+    }
+    
+    // Get shipment details for confirmation message
+    const shipment = await database.getShipment(trackingNumber);
+    const shipmentInfo = shipment ? `${trackingNumber} - ${shipment.recipientName || ''}` : trackingNumber;
+    
+    // Confirm deletion
+    const confirmMessage = lang === 'ar' 
+        ? `هل أنت متأكد من حذف الشحنة ${shipmentInfo}؟\n\nهذا الإجراء لا يمكن التراجع عنه.`
+        : `Are you sure you want to delete shipment ${shipmentInfo}?\n\nThis action cannot be undone.`;
+    
+    if (!confirm(confirmMessage)) {
+        return;
+    }
+    
+    try {
+        const deleted = await database.deleteShipment(trackingNumber);
+        
+        if (deleted) {
+            const successMessage = lang === 'ar'
+                ? 'تم حذف الشحنة بنجاح'
+                : 'Shipment deleted successfully';
+            alert(successMessage);
+            
+            // Refresh the list
+            const searchInput = document.getElementById('searchTracking');
+            if (searchInput && searchInput.value.trim()) {
+                await searchShipment();
+            } else {
+                await loadAllShipments();
+            }
+        } else {
+            const errorMessage = lang === 'ar'
+                ? 'فشل حذف الشحنة. يرجى المحاولة مرة أخرى.'
+                : 'Failed to delete shipment. Please try again.';
+            alert(errorMessage);
+        }
+    } catch (error) {
+        console.error('Error deleting shipment:', error);
+        const errorMessage = lang === 'ar'
+            ? 'حدث خطأ أثناء حذف الشحنة: ' + error.message
+            : 'Error deleting shipment: ' + error.message;
+        alert(errorMessage);
+    }
+}
+
 // Make functions available globally
 window.openEditModal = openEditModal;
 window.openEditDescriptionModal = openEditDescriptionModal;
@@ -812,4 +864,5 @@ window.addSuggestedTag = addSuggestedTag;
 window.addEditSuggestedTag = addEditSuggestedTag;
 window.saveTags = saveTags;
 window.renderTags = renderTags;
+window.deleteShipment = deleteShipment;
 

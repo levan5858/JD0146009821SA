@@ -76,6 +76,50 @@
 
 ---
 
+## 🎯 Solution: Use Custom Record Group (If Available)
+
+**If Spaceship has a "Custom Group" or "Custom Record Group" option, this is the BEST solution!**
+
+### How to Use Custom Group:
+
+1. **Create a Custom Group:**
+   - Look for "Create Custom Group" or "New Record Group" button
+   - Name it something like "GitHub Pages" or "Website DNS"
+   - Click "Create" or "Save"
+
+2. **Add All 4 A Records to This Custom Group:**
+   - **IMPORTANT:** Create 4 SEPARATE A records (not one record with 4 IPs)
+   - Each record should be:
+     - Type: A
+     - Name/Host: `@`
+     - Value: One of the 4 IPs (see below)
+     - TTL: 3600
+     - **Make sure each record is added to your Custom Group**
+
+3. **The 4 A Records You Need:**
+   - Record 1: `@` → `185.199.108.153`
+   - Record 2: `@` → `185.199.109.153`
+   - Record 3: `@` → `185.199.110.153`
+   - Record 4: `@` → `185.199.111.153`
+
+4. **Add CNAME to Custom Group:**
+   - Type: CNAME
+   - Name/Host: `www`
+   - Value: `levan5858.github.io`
+   - TTL: 3600
+
+### Why This Works:
+- Custom groups are separate from the "Default Record Group"
+- This avoids conflicts with hidden default records
+- All your records will be organized together
+
+### ⚠️ Important:
+- You need **4 separate A records**, each with a different IP
+- Don't try to put 4 IPs in one record
+- All records should have Name/Host: `@` (for root domain)
+
+---
+
 ## 🎯 Alternative Solution: Use Custom Nameservers
 
 If you can't delete the default records, you can use **Custom Nameservers** instead:
@@ -147,10 +191,50 @@ After deleting defaults and adding your records, you should see:
 
 ---
 
-## 🆘 If You Can't Delete Default Records
+## 🆘 If You Can't Delete Default Records (Empty List But Still Getting Error)
 
-### Contact Spaceship Support:
+**This means Spaceship has hidden/system default records that you can't see or delete.**
 
+### Try These Solutions (In Order):
+
+#### Solution 1: Proceed Despite Warning ⚠️
+1. **When you see the conflict warning, try clicking:**
+   - "OK" or "Continue" 
+   - "Add Anyway" or "Proceed"
+   - Sometimes it's just a warning and you can still add the record
+
+2. **If it lets you proceed, add all 4 A records this way**
+
+#### Solution 2: Look for Default Record Group Toggle 🔄
+1. **In your DNS management page, look for:**
+   - A toggle/switch labeled "Default Records" or "Default Record Group"
+   - A checkbox to "Disable Default Records"
+   - An option to "Use Custom DNS Only"
+   - A section that says "Default Record Group" with a disable button
+
+2. **If you find it:**
+   - Toggle it OFF
+   - OR click "Disable"
+   - Then try adding your records again
+
+#### Solution 3: Add Records One at a Time 🕐
+1. **Add the first A record:**
+   - Type: A
+   - Name: `@`
+   - Value: `185.199.108.153`
+   - Click "Save" or "Add"
+   - **Wait 5-10 seconds**
+
+2. **Add the second A record:**
+   - Type: A
+   - Name: `@`
+   - Value: `185.199.109.153`
+   - Click "Save"
+   - **Wait 5-10 seconds**
+
+3. **Continue with the remaining 2 A records and CNAME**
+
+#### Solution 4: Contact Spaceship Support 📞
 1. **Go to:** https://www.spaceship.com/support/
 2. **Contact them:**
    - Email: support@spaceship.com
@@ -158,9 +242,10 @@ After deleting defaults and adding your records, you should see:
    - Support ticket
 
 3. **Ask them to:**
-   - Remove default DNS records
+   - Remove hidden default DNS records
    - Disable default record group
    - Allow you to manage DNS manually
+   - Tell them: "I'm trying to add GitHub Pages A records but getting a conflict with hidden default records"
 
 ---
 
@@ -194,4 +279,5 @@ After deleting defaults and adding your records, you should see:
 ---
 
 **Once you've deleted the default records, you should be able to add all 4 A records without conflicts!** 🚀
+
 

@@ -247,3 +247,4 @@ function getExchangeRate(currency) {
     return currencyRates[currency] || 1.0;
 }
 
+

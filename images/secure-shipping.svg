@@ -1,0 +1,12 @@
+<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6b9f3d;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8bc34a;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" fill="url(#grad3)"/>
+  <text x="50%" y="50%" font-family="Arial, sans-serif" font-size="26" font-weight="bold" fill="white" text-anchor="middle" dy=".3em">Secure Shipping</text>
+  <rect x="150" y="120" width="100" height="80" rx="5" stroke="white" stroke-width="3" fill="none" opacity="0.8"/>
+  <path d="M 170 150 L 190 170 L 230 130" stroke="white" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.8"/>
+</svg>
